@@ -1,0 +1,53 @@
+# Model configurations for cross-domain object detection evaluation
+
+models:
+  yolov8n:
+    name: YOLOv8 Nano
+    backend: ultralytics
+    weights: yolov8n.pt
+    description: Fastest YOLOv8 variant, suitable for real-time inference.
+    input_size: 640
+    default_confidence: 0.25
+
+  yolov8s:
+    name: YOLOv8 Small
+    backend: ultralytics
+    weights: yolov8s.pt
+    description: Small YOLOv8 variant balancing speed and accuracy.
+    input_size: 640
+    default_confidence: 0.25
+
+  yolov8m:
+    name: YOLOv8 Medium
+    backend: ultralytics
+    weights: yolov8m.pt
+    description: Medium YOLOv8 variant for higher accuracy.
+    input_size: 640
+    default_confidence: 0.25
+
+  yolov8l:
+    name: YOLOv8 Large
+    backend: ultralytics
+    weights: yolov8l.pt
+    description: Large YOLOv8 variant for high accuracy.
+    input_size: 640
+    default_confidence: 0.25
+
+  yolov8x:
+    name: YOLOv8 XLarge
+    backend: ultralytics
+    weights: yolov8x.pt
+    description: Largest YOLOv8 variant for maximum accuracy.
+    input_size: 640
+    default_confidence: 0.25
+
+  grounding-dino:
+    name: Grounding DINO
+    backend: transformers
+    model_id: IDEA-Research/grounding-dino-tiny
+    description: >-
+      Open-vocabulary object detector using text prompts.
+      Enables zero-shot detection of arbitrary object categories.
+    input_size: 800
+    default_box_threshold: 0.35
+    default_text_threshold: 0.25

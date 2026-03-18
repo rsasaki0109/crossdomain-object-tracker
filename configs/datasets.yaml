@@ -1,0 +1,90 @@
+# Dataset configurations for cross-domain object detection evaluation
+
+datasets:
+  covla:
+    name: CoVLA
+    description: >-
+      Vision-Language-Action dataset for autonomous driving.
+      Contains driving scenes with rich annotations including
+      natural language descriptions and planned actions.
+    domain: autonomous_driving
+    source: Toyota Research Institute
+    url: https://huggingface.co/datasets/tier4/CoVLA_Dataset
+    download_method: huggingface
+    huggingface_repo: tier4/CoVLA_Dataset
+    modalities:
+      - camera
+    annotation_format: coco
+    license: CC-BY-NC-4.0
+    paper_url: "https://arxiv.org/abs/2408.10845"
+    sample_images_url:
+      - "https://images.unsplash.com/photo-1449965408869-ebd3fee7a01d?w=640"
+      - "https://images.unsplash.com/photo-1502877338535-766e1452684a?w=640"
+      - "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=640"
+
+  polaris:
+    name: PoLaRIS
+    description: >-
+      Pohang Canal Dataset for Maritime Object Detection and Tracking.
+      Captured in the Pohang Canal area with multi-sensor data for
+      maritime autonomous surface ship perception.
+    domain: maritime
+    source: KAIST
+    url: https://sites.google.com/view/polaris-dataset
+    download_method: url
+    modalities:
+      - camera
+      - lidar
+      - radar
+      - gps
+      - imu
+    annotation_format: custom
+    license: research-only
+    paper_url: "https://arxiv.org/abs/2307.12629"
+    sample_images_url:
+      - "https://images.unsplash.com/photo-1534224039826-c7a0eda0e6b3?w=640"
+      - "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=640"
+      - "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=640"
+
+  mcd:
+    name: MCD
+    description: >-
+      Multi-Campus Dataset for robot perception across geographically
+      diverse environments. Collected at NTU (Singapore), KTH (Sweden),
+      KAIST (South Korea), and other campuses with LiDAR, camera, and IMU.
+    domain: campus
+    source: NTU / KTH / KAIST
+    url: https://mcdviral.github.io/
+    download_method: url
+    modalities:
+      - camera
+      - lidar
+      - imu
+    annotation_format: custom
+    license: CC-BY-NC-SA-4.0
+    paper_url: "https://arxiv.org/abs/2301.12667"
+    sample_images_url:
+      - "https://images.unsplash.com/photo-1562774053-701939374585?w=640"
+      - "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=640"
+      - "https://images.unsplash.com/photo-1523050854058-8df90110c476?w=640"
+
+  hm3d-ovon:
+    name: HM3D-OVON
+    description: >-
+      Habitat Matterport 3D Open-Vocabulary Object-Goal Navigation.
+      Indoor 3D scans with dense semantic annotations, enabling
+      open-vocabulary object detection evaluation in indoor environments.
+    domain: indoor
+    source: Meta AI / Matterport
+    url: https://aihabitat.org/datasets/hm3d-semantics/
+    download_method: url
+    modalities:
+      - rgb-d
+      - semantic_3d
+    annotation_format: habitat
+    license: research-only
+    paper_url: "https://arxiv.org/abs/2311.02991"
+    sample_images_url:
+      - "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=640"
+      - "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=640"
+      - "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=640"
