@@ -134,6 +134,19 @@ body {
   margin: 0 auto;
 }
 
+/* Model badge */
+.model-badge {
+  display: inline-block;
+  margin-top: 1.25rem;
+  padding: 0.4rem 1rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
 /* Sections */
 .section {
   max-width: 1400px;
@@ -330,23 +343,31 @@ body {
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
 }
 
 .gallery-item {
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  position: relative;
 }
 
-.gallery-item:hover { transform: translateY(-2px); }
+.gallery-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
 
-.gallery-item svg {
+.gallery-item img {
   width: 100%;
+  max-width: 400px;
   display: block;
+  margin: 0 auto;
+  border-radius: 0;
 }
 
 .gallery-item .info {
@@ -355,6 +376,69 @@ body {
   color: var(--text-secondary);
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+.gallery-item .info .domain-label {
+  font-weight: 600;
+}
+
+.gallery-item .info .detection-count {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+}
+
+.gallery-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(22, 33, 62, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s;
+  padding: 1.5rem;
+  pointer-events: none;
+}
+
+.gallery-item:hover .gallery-overlay {
+  opacity: 1;
+}
+
+.gallery-overlay .overlay-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+}
+
+.gallery-overlay .overlay-stat {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.3rem;
+}
+
+.gallery-overlay .overlay-classes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  justify-content: center;
+}
+
+.gallery-overlay .class-tag {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.1);
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
 /* Footer */
@@ -401,6 +485,7 @@ body {
   .hero h2 { font-size: 1.75rem; }
   .chart-grid { grid-template-columns: 1fr; }
   .domain-cards { grid-template-columns: 1fr 1fr; }
+  .gallery-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
@@ -433,6 +518,7 @@ body {
 <div class="hero">
   <h2>Cross-Domain Object Tracker</h2>
   <p>Interactive visualization of object detection across robotics domains. Explore detection results from Maritime, Autonomous Driving, Multi-Campus, and Indoor Navigation environments.</p>
+  <div class="model-badge">Results generated with YOLOv8n (conf&ge;0.25) on sample images</div>
 </div>
 
 <!-- Domain Overview -->
@@ -488,8 +574,8 @@ body {
 
 <!-- Gallery -->
 <section class="section" id="gallery">
-  <h2 class="section-title">Sample Detection Gallery</h2>
-  <p class="section-subtitle">Simulated detection results with bounding boxes across domains</p>
+  <h2 class="section-title">Detection Gallery</h2>
+  <p class="section-subtitle">YOLOv8n annotated detection results across domains</p>
   <div class="gallery-tabs" id="galleryTabs"></div>
   <div class="gallery-grid" id="galleryGrid"></div>
 </section>
@@ -506,19 +592,8 @@ body {
 
 <script>
 // ============================================================
-// DATA
+// DATA - Real YOLOv8n detection results
 // ============================================================
-
-function generateConfidences(n, mean, std) {
-  const vals = [];
-  for (let i = 0; i < n; i++) {
-    let u1 = Math.random(), u2 = Math.random();
-    let z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-    let v = mean + z * std;
-    vals.push(Math.max(0.15, Math.min(0.99, v)));
-  }
-  return vals;
-}
 
 const domainData = {
   maritime: {
@@ -526,56 +601,72 @@ const domainData = {
     key: "maritime",
     color: "#0ea5e9",
     emoji: "\u26F5",
-    description: "Object detection in harbor and open-water maritime environments. Specialized classes include vessels, buoys, and navigation aids.",
-    classes: { person: 12, boat: 45, buoy: 38, ship: 22, kayak: 8, dock: 15, bird: 5, car: 3, bicycle: 0, truck: 0, traffic_light: 0, bus: 0, motorcycle: 0, bench: 2, backpack: 1, dog: 0, skateboard: 0, chair: 1, table: 0, couch: 0, tv: 0, book: 0, bottle: 2, plant: 0 },
-    confidences: generateConfidences(60, 0.78, 0.12),
-    images: 120,
-    avgDetectionsPerImage: 3.2,
-    uniqueClasses: 12,
-    detectionDensity: 2.8,
-    avgObjectSize: 45
+    description: "Object detection in harbor and open-water maritime environments. Sparse detections reflect challenging marine conditions.",
+    classes: { person: 1 },
+    confidences: [0.843],
+    images: 3,
+    totalDetections: 1,
+    uniqueClasses: 1,
+    avgConfidence: 0.843,
+    perImage: [
+      { filename: "maritime_01.jpg", detections: 0, classes: {}, confidences: [] },
+      { filename: "maritime_02.jpg", detections: 1, classes: { person: 1 }, confidences: [0.843] },
+      { filename: "maritime_03.jpg", detections: 0, classes: {}, confidences: [] }
+    ]
   },
   driving: {
     name: "Driving (CoVLA)",
     key: "driving",
     color: "#f59e0b",
     emoji: "\uD83D\uDE97",
-    description: "Urban and highway autonomous driving scenarios. Rich in traffic participants and infrastructure elements.",
-    classes: { person: 89, car: 156, bicycle: 23, truck: 34, traffic_light: 67, bus: 12, motorcycle: 18, boat: 0, buoy: 0, ship: 0, kayak: 0, dock: 0, bird: 3, bench: 5, backpack: 2, dog: 1, skateboard: 0, chair: 0, table: 0, couch: 0, tv: 0, book: 0, bottle: 0, plant: 0 },
-    confidences: generateConfidences(60, 0.82, 0.10),
-    images: 200,
-    avgDetectionsPerImage: 5.1,
-    uniqueClasses: 11,
-    detectionDensity: 5.5,
-    avgObjectSize: 38
+    description: "Urban autonomous driving scenarios. Dense detections of traffic participants and infrastructure in a single busy scene.",
+    classes: { car: 10, person: 8, traffic_light: 4 },
+    confidences: [0.8632, 0.7631, 0.7174, 0.7157, 0.6851, 0.6141, 0.5633, 0.5251, 0.4832, 0.4807, 0.474, 0.4143, 0.3928, 0.3734, 0.3486, 0.348, 0.3384, 0.3325, 0.3269, 0.3207, 0.2831, 0.2681],
+    images: 3,
+    totalDetections: 22,
+    uniqueClasses: 3,
+    avgConfidence: 0.483,
+    perImage: [
+      { filename: "driving_01.jpg", detections: 22, classes: { car: 10, person: 8, traffic_light: 4 }, confidences: [0.8632, 0.7631, 0.7174, 0.7157, 0.6851, 0.6141, 0.5633, 0.5251, 0.4832, 0.4807, 0.474, 0.4143, 0.3928, 0.3734, 0.3486, 0.348, 0.3384, 0.3325, 0.3269, 0.3207, 0.2831, 0.2681] },
+      { filename: "driving_02.jpg", detections: 0, classes: {}, confidences: [] },
+      { filename: "driving_03.jpg", detections: 0, classes: {}, confidences: [] }
+    ]
   },
   campus: {
     name: "Campus (MCD)",
     key: "campus",
     color: "#10b981",
     emoji: "\uD83C\uDFEB",
-    description: "Multi-campus outdoor environments with pedestrians, cyclists, and campus infrastructure across different universities.",
-    classes: { person: 134, bicycle: 45, car: 28, bench: 19, backpack: 22, dog: 8, skateboard: 5, boat: 0, buoy: 0, ship: 0, kayak: 0, dock: 0, bird: 6, truck: 3, traffic_light: 4, bus: 2, motorcycle: 7, chair: 3, table: 2, couch: 0, tv: 0, book: 1, bottle: 4, plant: 8 },
-    confidences: generateConfidences(60, 0.75, 0.14),
-    images: 150,
-    avgDetectionsPerImage: 4.0,
-    uniqueClasses: 17,
-    detectionDensity: 4.2,
-    avgObjectSize: 32
+    description: "Multi-campus outdoor environments with pedestrians, kites, and varied objects across different scenes.",
+    classes: { person: 8, kite: 7, book: 2 },
+    confidences: [0.8698, 0.8398, 0.8189, 0.803, 0.7908, 0.6903, 0.6564, 0.588, 0.555, 0.5181, 0.5142, 0.4639, 0.4136, 0.3749, 0.32, 0.3012, 0.2809],
+    images: 3,
+    totalDetections: 17,
+    uniqueClasses: 3,
+    avgConfidence: 0.576,
+    perImage: [
+      { filename: "campus_01.jpg", detections: 15, classes: { person: 8, kite: 7 }, confidences: [0.8698, 0.8398, 0.8189, 0.803, 0.7908, 0.6903, 0.6564, 0.588, 0.555, 0.5181, 0.5142, 0.4639, 0.3749, 0.32, 0.2809] },
+      { filename: "campus_02.jpg", detections: 0, classes: {}, confidences: [] },
+      { filename: "campus_03.jpg", detections: 2, classes: { book: 2 }, confidences: [0.4136, 0.3012] }
+    ]
   },
   indoor: {
     name: "Indoor (HM3D-OVON)",
     key: "indoor",
     color: "#8b5cf6",
     emoji: "\uD83C\uDFE0",
-    description: "Indoor navigation in photorealistic 3D environments. Focus on furniture, appliances, and household objects.",
-    classes: { chair: 78, table: 45, couch: 23, tv: 12, book: 34, bottle: 28, plant: 15, person: 5, boat: 0, buoy: 0, ship: 0, kayak: 0, dock: 0, bird: 0, car: 0, bicycle: 0, truck: 0, traffic_light: 0, bus: 0, motorcycle: 0, bench: 3, backpack: 2, dog: 0, skateboard: 0 },
-    confidences: generateConfidences(60, 0.80, 0.11),
-    images: 180,
-    avgDetectionsPerImage: 2.8,
-    uniqueClasses: 10,
-    detectionDensity: 3.0,
-    avgObjectSize: 52
+    description: "Indoor navigation in photorealistic 3D environments. Diverse household objects detected across rooms.",
+    classes: { couch: 1, chair: 1, tv: 1, bed: 1, microwave: 1, wine_glass: 1 },
+    confidences: [0.9429, 0.781, 0.6978, 0.6371, 0.3668, 0.3149],
+    images: 3,
+    totalDetections: 6,
+    uniqueClasses: 6,
+    avgConfidence: 0.623,
+    perImage: [
+      { filename: "indoor_01.jpg", detections: 1, classes: { couch: 1 }, confidences: [0.781] },
+      { filename: "indoor_02.jpg", detections: 2, classes: { chair: 1, tv: 1 }, confidences: [0.9429, 0.6371] },
+      { filename: "indoor_03.jpg", detections: 3, classes: { bed: 1, microwave: 1, wine_glass: 1 }, confidences: [0.6978, 0.3668, 0.3149] }
+    ]
   }
 };
 
@@ -602,8 +693,6 @@ function renderDomainCards() {
   const container = document.getElementById('domainCards');
   container.innerHTML = domainKeys.map(key => {
     const d = domainData[key];
-    const totalDetections = Object.values(d.classes).reduce((a, b) => a + b, 0);
-    const avgConf = (d.confidences.reduce((a, b) => a + b, 0) / d.confidences.length).toFixed(2);
     return `
       <div class="domain-card animate-in" style="--card-accent:${d.color}" data-domain="${key}" onclick="toggleDomain('${key}')">
         <span class="emoji">${d.emoji}</span>
@@ -612,8 +701,8 @@ function renderDomainCards() {
         <div class="description">${d.description}</div>
         <div class="stats">
           <div class="stat"><div class="stat-value">${d.images}</div><div class="stat-label">Images</div></div>
-          <div class="stat"><div class="stat-value">${totalDetections}</div><div class="stat-label">Detections</div></div>
-          <div class="stat"><div class="stat-value">${avgConf}</div><div class="stat-label">Avg Conf</div></div>
+          <div class="stat"><div class="stat-value">${d.totalDetections}</div><div class="stat-label">Detections</div></div>
+          <div class="stat"><div class="stat-value">${d.avgConfidence.toFixed(3)}</div><div class="stat-label">Avg Conf</div></div>
           <div class="stat"><div class="stat-value">${d.uniqueClasses}</div><div class="stat-label">Classes</div></div>
         </div>
       </div>`;
@@ -676,7 +765,9 @@ function renderBoxChart() {
       type: 'box',
       marker: { color: d.color },
       opacity: activeDomain && activeDomain !== k ? 0.2 : 1,
-      boxpoints: 'outliers'
+      boxpoints: 'all',
+      jitter: 0.3,
+      pointpos: -1.5
     };
   });
 
@@ -692,26 +783,25 @@ function renderBoxChart() {
 // ============================================================
 
 function renderRadarChart() {
-  const categories = ['Num Objects', 'Avg Confidence', 'Unique Classes', 'Detection Density', 'Avg Object Size'];
+  const categories = ['Total Detections', 'Avg Confidence', 'Unique Classes', 'Detections/Image', 'Max Confidence'];
 
   const maxVals = {
-    numObj: Math.max(...domainKeys.map(k => Object.values(domainData[k].classes).reduce((a, b) => a + b, 0))),
+    total: Math.max(...domainKeys.map(k => domainData[k].totalDetections)),
     conf: 1,
     unique: Math.max(...domainKeys.map(k => domainData[k].uniqueClasses)),
-    density: Math.max(...domainKeys.map(k => domainData[k].detectionDensity)),
-    size: Math.max(...domainKeys.map(k => domainData[k].avgObjectSize))
+    perImg: Math.max(...domainKeys.map(k => domainData[k].totalDetections / domainData[k].images)),
+    maxConf: 1
   };
 
   const traces = domainKeys.map(k => {
     const d = domainData[k];
-    const total = Object.values(d.classes).reduce((a, b) => a + b, 0);
-    const avgConf = d.confidences.reduce((a, b) => a + b, 0) / d.confidences.length;
+    const maxConf = d.confidences.length > 0 ? Math.max(...d.confidences) : 0;
     const r = [
-      total / maxVals.numObj,
-      avgConf / maxVals.conf,
+      d.totalDetections / maxVals.total,
+      d.avgConfidence / maxVals.conf,
       d.uniqueClasses / maxVals.unique,
-      d.detectionDensity / maxVals.density,
-      d.avgObjectSize / maxVals.size
+      (d.totalDetections / d.images) / maxVals.perImg,
+      maxConf / maxVals.maxConf
     ];
     return {
       type: 'scatterpolar',
@@ -742,7 +832,10 @@ function renderRadarChart() {
 // ============================================================
 
 function renderHeatmapChart() {
-  const topClasses = ['person', 'car', 'bicycle', 'boat', 'chair', 'table', 'truck', 'buoy', 'ship', 'traffic_light', 'bus', 'bench', 'backpack', 'couch', 'book', 'bottle', 'plant', 'dog', 'motorcycle'];
+  const allClasses = new Set();
+  domainKeys.forEach(k => Object.keys(domainData[k].classes).forEach(c => { if (domainData[k].classes[c] > 0) allClasses.add(c); }));
+  const topClasses = [...allClasses].sort();
+
   const z = domainKeys.map(k => topClasses.map(c => domainData[k].classes[c] || 0));
   const domainNames = domainKeys.map(k => domainData[k].name.split(' (')[0]);
 
@@ -774,29 +867,30 @@ function renderHeatmapChart() {
 function renderScatterChart() {
   const traces = domainKeys.map(k => {
     const d = domainData[k];
-    const n = d.images;
     const xs = [], ys = [], texts = [];
-    for (let i = 0; i < Math.min(n, 40); i++) {
-      const numDet = Math.max(1, Math.round(d.avgDetectionsPerImage + (Math.random() - 0.5) * 4));
-      const avgConf = d.confidences[i % d.confidences.length] + (Math.random() - 0.5) * 0.08;
-      xs.push(numDet);
-      ys.push(Math.max(0.2, Math.min(0.99, avgConf)));
-      texts.push(`Image ${i + 1}<br>${d.name.split(' (')[0]}<br>Detections: ${numDet}`);
-    }
+    d.perImage.forEach(img => {
+      xs.push(img.detections);
+      const avgConf = img.confidences.length > 0
+        ? img.confidences.reduce((a, b) => a + b, 0) / img.confidences.length
+        : 0;
+      ys.push(avgConf);
+      const classList = Object.keys(img.classes).join(', ') || 'none';
+      texts.push(`${img.filename}<br>${d.name.split(' (')[0]}<br>Detections: ${img.detections}<br>Classes: ${classList}`);
+    });
     return {
       x: xs, y: ys, text: texts,
       mode: 'markers',
       type: 'scatter',
       name: d.name.split(' (')[0],
-      marker: { color: d.color, size: 8, opacity: activeDomain && activeDomain !== k ? 0.1 : 0.7 },
-      hovertemplate: '%{text}<br>Avg Confidence: %{y:.2f}<extra></extra>'
+      marker: { color: d.color, size: 12, opacity: activeDomain && activeDomain !== k ? 0.1 : 0.8, line: { width: 1, color: '#fff' } },
+      hovertemplate: '%{text}<br>Avg Confidence: %{y:.3f}<extra></extra>'
     };
   });
 
   Plotly.newPlot('scatterChart', traces, {
     ...plotlyLayout,
-    xaxis: { ...plotlyLayout.xaxis, title: 'Number of Detections' },
-    yaxis: { ...plotlyLayout.yaxis, title: 'Average Confidence', range: [0.2, 1.05] },
+    xaxis: { ...plotlyLayout.xaxis, title: 'Number of Detections per Image' },
+    yaxis: { ...plotlyLayout.yaxis, title: 'Average Confidence', range: [-0.05, 1.05] },
     legend: { ...plotlyLayout.legend, orientation: 'h', y: -0.2 }
   }, plotlyConfig);
 }
@@ -820,7 +914,7 @@ function renderSunburstChart() {
     values.push(total);
     colors.push(d.color);
 
-    Object.entries(d.classes).filter(([_, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 8).forEach(([cls, cnt]) => {
+    Object.entries(d.classes).filter(([_, v]) => v > 0).sort((a, b) => b[1] - a[1]).forEach(([cls, cnt]) => {
       labels.push(`${cls} (${dName.charAt(0)})`);
       parents.push(dName);
       values.push(cnt);
@@ -918,39 +1012,6 @@ function renderGapAnalysis() {
 // GALLERY
 // ============================================================
 
-function generateBboxSVG(domainKey, imgIndex) {
-  const d = domainData[domainKey];
-  const w = 320, h = 200;
-  const bgColors = { maritime: '#0c2d48', driving: '#2d2b1e', campus: '#1a2e1a', indoor: '#2a1f3d' };
-
-  const topClasses = Object.entries(d.classes).filter(([_, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 5);
-  const numBoxes = 2 + Math.floor(Math.random() * 3);
-  let boxes = '';
-  const rng = (seed) => {
-    let s = seed + imgIndex * 7 + domainKey.length * 13;
-    return () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
-  };
-  const rand = rng(imgIndex);
-
-  for (let b = 0; b < numBoxes; b++) {
-    const cls = topClasses[b % topClasses.length][0];
-    const bx = Math.floor(rand() * (w - 80)) + 10;
-    const by = Math.floor(rand() * (h - 60)) + 10;
-    const bw = Math.floor(rand() * 80) + 40;
-    const bh = Math.floor(rand() * 50) + 30;
-    const conf = (0.6 + rand() * 0.38).toFixed(2);
-    boxes += `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="none" stroke="${d.color}" stroke-width="2" rx="2"/>`;
-    boxes += `<rect x="${bx}" y="${by - 16}" width="${cls.length * 7 + 40}" height="16" fill="${d.color}" rx="2"/>`;
-    boxes += `<text x="${bx + 3}" y="${by - 4}" fill="#fff" font-size="10" font-family="Inter,sans-serif">${cls} ${conf}</text>`;
-  }
-
-  return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
-    <rect width="${w}" height="${h}" fill="${bgColors[domainKey]}"/>
-    <text x="${w/2}" y="${h/2}" text-anchor="middle" fill="${d.color}33" font-size="40" font-family="Inter,sans-serif">${d.emoji}</text>
-    ${boxes}
-  </svg>`;
-}
-
 function renderGallery(filter) {
   const tabs = document.getElementById('galleryTabs');
   tabs.innerHTML = `<button class="gallery-tab ${!filter ? 'active' : ''}" style="--tab-color:#94a3b8" onclick="renderGallery(null)">All</button>`;
@@ -964,16 +1025,29 @@ function renderGallery(filter) {
   let html = '';
   keys.forEach(k => {
     const d = domainData[k];
-    const count = filter ? 6 : 3;
-    for (let i = 0; i < count; i++) {
-      html += `<div class="gallery-item">
-        ${generateBboxSVG(k, i)}
+    d.perImage.forEach(img => {
+      const classList = Object.entries(img.classes).map(([cls, cnt]) => `${cls}: ${cnt}`).join(', ') || 'No detections';
+      const classTags = Object.entries(img.classes).map(([cls, cnt]) =>
+        `<span class="class-tag" style="border:1px solid ${d.color}40">${cls} (${cnt})</span>`
+      ).join('');
+      const avgConf = img.confidences.length > 0
+        ? (img.confidences.reduce((a, b) => a + b, 0) / img.confidences.length).toFixed(3)
+        : 'N/A';
+
+      html += `<div class="gallery-item" style="border-color:${d.color}40">
+        <img src="gallery/${k}/${img.filename}" alt="${img.filename}" loading="lazy">
+        <div class="gallery-overlay">
+          <div class="overlay-title" style="color:${d.color}">${d.name.split(' (')[0]}</div>
+          <div class="overlay-stat">Detections: ${img.detections}</div>
+          <div class="overlay-stat">Avg Confidence: ${avgConf}</div>
+          ${classTags ? '<div class="overlay-classes">' + classTags + '</div>' : '<div class="overlay-stat" style="margin-top:0.5rem;font-style:italic">No objects detected</div>'}
+        </div>
         <div class="info">
-          <span>${d.name.split(' (')[0]} - Image ${i + 1}</span>
-          <span style="color:${d.color}">${d.emoji}</span>
+          <span class="domain-label" style="color:${d.color}">${d.name.split(' (')[0]} &mdash; ${img.filename}</span>
+          <span class="detection-count" style="color:${d.color}">${img.detections} det.</span>
         </div>
       </div>`;
-    }
+    });
   });
   grid.innerHTML = html;
 }

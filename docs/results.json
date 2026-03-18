@@ -1,0 +1,591 @@
+{
+  "model": "yolov8n",
+  "domains": {
+    "maritime": {
+      "images": [
+        {
+          "filename": "maritime_01.jpg",
+          "detections": []
+        },
+        {
+          "filename": "maritime_02.jpg",
+          "detections": [
+            {
+              "class": "person",
+              "confidence": 0.843,
+              "bbox": [
+                342.1,
+                83.5,
+                517.9,
+                284.8
+              ]
+            }
+          ]
+        },
+        {
+          "filename": "maritime_03.jpg",
+          "detections": []
+        }
+      ],
+      "stats": {
+        "total_detections": 1,
+        "avg_confidence": 0.843,
+        "classes": {
+          "person": 1
+        }
+      }
+    },
+    "driving": {
+      "images": [
+        {
+          "filename": "driving_01.jpg",
+          "detections": [
+            {
+              "class": "car",
+              "confidence": 0.8632,
+              "bbox": [
+                585.8,
+                301.8,
+                639.7,
+                351.1
+              ]
+            },
+            {
+              "class": "car",
+              "confidence": 0.7631,
+              "bbox": [
+                346.1,
+                294.0,
+                372.8,
+                314.3
+              ]
+            },
+            {
+              "class": "car",
+              "confidence": 0.7174,
+              "bbox": [
+                301.9,
+                293.3,
+                328.8,
+                313.9
+              ]
+            },
+            {
+              "class": "car",
+              "confidence": 0.7157,
+              "bbox": [
+                519.1,
+                290.5,
+                590.0,
+                338.1
+              ]
+            },
+            {
+              "class": "traffic light",
+              "confidence": 0.6851,
+              "bbox": [
+                415.7,
+                214.4,
+                424.4,
+                237.5
+              ]
+            },
+            {
+              "class": "car",
+              "confidence": 0.6141,
+              "bbox": [
+                486.0,
+                288.3,
+                535.0,
+                331.2
+              ]
+            },
+            {
+              "class": "traffic light",
+              "confidence": 0.5633,
+              "bbox": [
+                146.3,
+                206.3,
+                159.3,
+                230.9
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.5251,
+              "bbox": [
+                42.8,
+                289.9,
+                59.7,
+                330.6
+              ]
+            },
+            {
+              "class": "car",
+              "confidence": 0.4832,
+              "bbox": [
+                267.9,
+                293.2,
+                286.5,
+                311.6
+              ]
+            },
+            {
+              "class": "car",
+              "confidence": 0.4807,
+              "bbox": [
+                232.9,
+                290.7,
+                262.1,
+                316.0
+              ]
+            },
+            {
+              "class": "car",
+              "confidence": 0.474,
+              "bbox": [
+                332.9,
+                293.2,
+                347.0,
+                304.6
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.4143,
+              "bbox": [
+                209.6,
+                296.8,
+                221.3,
+                317.2
+              ]
+            },
+            {
+              "class": "traffic light",
+              "confidence": 0.3928,
+              "bbox": [
+                166.7,
+                227.8,
+                175.0,
+                244.6
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.3734,
+              "bbox": [
+                59.6,
+                284.5,
+                74.0,
+                318.8
+              ]
+            },
+            {
+              "class": "traffic light",
+              "confidence": 0.3486,
+              "bbox": [
+                246.7,
+                211.8,
+                259.0,
+                231.7
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.348,
+              "bbox": [
+                18.1,
+                287.0,
+                35.5,
+                341.9
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.3384,
+              "bbox": [
+                281.4,
+                291.6,
+                297.4,
+                320.3
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.3325,
+              "bbox": [
+                3.1,
+                294.0,
+                17.2,
+                334.5
+              ]
+            },
+            {
+              "class": "car",
+              "confidence": 0.3269,
+              "bbox": [
+                431.8,
+                298.6,
+                458.2,
+                316.2
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.3207,
+              "bbox": [
+                88.7,
+                287.0,
+                98.2,
+                326.3
+              ]
+            },
+            {
+              "class": "car",
+              "confidence": 0.2831,
+              "bbox": [
+                402.3,
+                293.7,
+                424.0,
+                312.8
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.2681,
+              "bbox": [
+                154.6,
+                290.2,
+                164.0,
+                317.3
+              ]
+            }
+          ]
+        },
+        {
+          "filename": "driving_02.jpg",
+          "detections": []
+        },
+        {
+          "filename": "driving_03.jpg",
+          "detections": []
+        }
+      ],
+      "stats": {
+        "total_detections": 22,
+        "avg_confidence": 0.4833,
+        "classes": {
+          "car": 10,
+          "person": 8,
+          "traffic light": 4
+        }
+      }
+    },
+    "campus": {
+      "images": [
+        {
+          "filename": "campus_01.jpg",
+          "detections": [
+            {
+              "class": "person",
+              "confidence": 0.8698,
+              "bbox": [
+                417.6,
+                207.7,
+                475.0,
+                378.8
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.8398,
+              "bbox": [
+                470.6,
+                224.4,
+                521.0,
+                372.3
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.8189,
+              "bbox": [
+                150.8,
+                232.5,
+                198.0,
+                374.7
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.803,
+              "bbox": [
+                204.2,
+                228.9,
+                252.9,
+                377.1
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.7908,
+              "bbox": [
+                264.8,
+                231.5,
+                311.9,
+                375.3
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.6903,
+              "bbox": [
+                315.5,
+                234.2,
+                362.1,
+                378.3
+              ]
+            },
+            {
+              "class": "kite",
+              "confidence": 0.6564,
+              "bbox": [
+                326.5,
+                99.4,
+                338.6,
+                120.2
+              ]
+            },
+            {
+              "class": "kite",
+              "confidence": 0.588,
+              "bbox": [
+                426.7,
+                138.7,
+                441.1,
+                159.4
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.555,
+              "bbox": [
+                99.2,
+                258.1,
+                123.0,
+                317.6
+              ]
+            },
+            {
+              "class": "person",
+              "confidence": 0.5181,
+              "bbox": [
+                365.0,
+                203.6,
+                416.8,
+                378.4
+              ]
+            },
+            {
+              "class": "kite",
+              "confidence": 0.5142,
+              "bbox": [
+                473.0,
+                172.2,
+                488.1,
+                191.1
+              ]
+            },
+            {
+              "class": "kite",
+              "confidence": 0.4639,
+              "bbox": [
+                426.4,
+                138.1,
+                440.7,
+                166.9
+              ]
+            },
+            {
+              "class": "kite",
+              "confidence": 0.3749,
+              "bbox": [
+                225.6,
+                131.3,
+                236.6,
+                153.7
+              ]
+            },
+            {
+              "class": "kite",
+              "confidence": 0.32,
+              "bbox": [
+                178.0,
+                166.0,
+                189.0,
+                185.4
+              ]
+            },
+            {
+              "class": "kite",
+              "confidence": 0.2809,
+              "bbox": [
+                377.4,
+                118.0,
+                390.2,
+                152.2
+              ]
+            }
+          ]
+        },
+        {
+          "filename": "campus_02.jpg",
+          "detections": []
+        },
+        {
+          "filename": "campus_03.jpg",
+          "detections": [
+            {
+              "class": "book",
+              "confidence": 0.4136,
+              "bbox": [
+                29.6,
+                109.2,
+                58.5,
+                243.6
+              ]
+            },
+            {
+              "class": "book",
+              "confidence": 0.3012,
+              "bbox": [
+                540.4,
+                81.4,
+                567.2,
+                234.8
+              ]
+            }
+          ]
+        }
+      ],
+      "stats": {
+        "total_detections": 17,
+        "avg_confidence": 0.5764,
+        "classes": {
+          "person": 8,
+          "kite": 7,
+          "book": 2
+        }
+      }
+    },
+    "indoor": {
+      "images": [
+        {
+          "filename": "indoor_01.jpg",
+          "detections": [
+            {
+              "class": "couch",
+              "confidence": 0.781,
+              "bbox": [
+                71.3,
+                160.6,
+                577.4,
+                359.4
+              ]
+            }
+          ]
+        },
+        {
+          "filename": "indoor_02.jpg",
+          "detections": [
+            {
+              "class": "chair",
+              "confidence": 0.9429,
+              "bbox": [
+                225.3,
+                282.1,
+                413.4,
+                467.2
+              ]
+            },
+            {
+              "class": "tv",
+              "confidence": 0.6371,
+              "bbox": [
+                570.0,
+                164.3,
+                639.8,
+                279.6
+              ]
+            }
+          ]
+        },
+        {
+          "filename": "indoor_03.jpg",
+          "detections": [
+            {
+              "class": "bed",
+              "confidence": 0.6978,
+              "bbox": [
+                126.7,
+                78.1,
+                593.5,
+                417.7
+              ]
+            },
+            {
+              "class": "microwave",
+              "confidence": 0.3668,
+              "bbox": [
+                0.2,
+                176.4,
+                143.6,
+                316.6
+              ]
+            },
+            {
+              "class": "wine glass",
+              "confidence": 0.3149,
+              "bbox": [
+                71.2,
+                120.0,
+                109.1,
+                180.2
+              ]
+            }
+          ]
+        }
+      ],
+      "stats": {
+        "total_detections": 6,
+        "avg_confidence": 0.6234,
+        "classes": {
+          "couch": 1,
+          "chair": 1,
+          "tv": 1,
+          "bed": 1,
+          "microwave": 1,
+          "wine glass": 1
+        }
+      }
+    }
+  },
+  "comparison": {
+    "total_images": 12,
+    "total_detections": 46,
+    "avg_confidence": 0.5438,
+    "classes": {
+      "person": 17,
+      "car": 10,
+      "kite": 7,
+      "traffic light": 4,
+      "book": 2,
+      "couch": 1,
+      "chair": 1,
+      "tv": 1,
+      "bed": 1,
+      "microwave": 1,
+      "wine glass": 1
+    }
+  }
+}
