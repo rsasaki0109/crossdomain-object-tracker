@@ -12,7 +12,6 @@ Usage:
 from __future__ import annotations
 
 import logging
-import shutil
 import urllib.request
 from pathlib import Path
 from typing import Any

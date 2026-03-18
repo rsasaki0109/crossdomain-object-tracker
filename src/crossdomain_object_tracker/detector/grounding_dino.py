@@ -53,7 +53,7 @@ class GroundingDINODetector(BaseDetector):
             return
 
         try:
-            import torch
+            import torch  # noqa: F401
             from transformers import AutoModelForZeroShotObjectDetection, AutoProcessor
         except ImportError as e:
             raise ImportError(

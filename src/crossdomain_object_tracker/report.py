@@ -16,8 +16,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-import pandas as pd
-
 from crossdomain_object_tracker.evaluate import compare_domains, compute_domain_gap
 from crossdomain_object_tracker.visualize import (
     plot_class_distribution,
