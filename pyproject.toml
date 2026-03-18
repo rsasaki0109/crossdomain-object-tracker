@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "crossdomain-object-tracker"
+version = "0.1.0"
+description = "Cross-domain object detection and tracking evaluation tool for robotics datasets"
+authors = [{ name = "rsasaki0109" }]
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "ultralytics",
+    "torch",
+    "torchvision",
+    "opencv-python",
+    "matplotlib",
+    "pandas",
+    "numpy",
+    "Pillow",
+    "pyyaml",
+    "huggingface-hub",
+    "gdown",
+    "tqdm",
+    "requests",
+]
+
+[project.optional-dependencies]
+grounding-dino = [
+    "transformers>=4.35.0",
+]
+dev = [
+    "pytest",
+    "ruff",
+    "mypy",
+]
+
+[project.scripts]
+crossdomain-tracker = "crossdomain_object_tracker.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 120

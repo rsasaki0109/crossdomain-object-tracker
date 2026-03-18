@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+
+# Model weights
+*.pt
+*.pth
+*.onnx
+
+# Data and outputs
+data/*
+!data/.gitkeep
+outputs/*
+!outputs/.gitkeep
+
+# Jupyter
+.ipynb_checkpoints/
+
+# mypy
+.mypy_cache/
+
+# pytest
+.pytest_cache/
+
+# ruff
+.ruff_cache/
