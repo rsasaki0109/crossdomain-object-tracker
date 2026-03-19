@@ -17,10 +17,6 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
-[project.urls]
-Homepage = "https://github.com/rsasaki0109/crossdomain-object-tracker"
-Documentation = "https://rsasaki0109.github.io/crossdomain-object-tracker/"
-Repository = "https://github.com/rsasaki0109/crossdomain-object-tracker"
 dependencies = [
     "ultralytics",
     "torch",
@@ -36,6 +32,11 @@ dependencies = [
     "tqdm",
     "requests",
 ]
+
+[project.urls]
+Homepage = "https://github.com/rsasaki0109/crossdomain-object-tracker"
+Documentation = "https://rsasaki0109.github.io/crossdomain-object-tracker/"
+Repository = "https://github.com/rsasaki0109/crossdomain-object-tracker"
 
 [project.optional-dependencies]
 grounding-dino = [
