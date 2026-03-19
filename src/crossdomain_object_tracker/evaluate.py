@@ -93,9 +93,7 @@ def evaluate_dataset(
     images = find_images(data_dir, max_samples=max_samples)
 
     if not images:
-        logger.warning(
-            "No images found in %s for dataset '%s'", data_dir, dataset_name
-        )
+        logger.warning("No images found in %s for dataset '%s'", data_dir, dataset_name)
         return {
             "dataset": dataset_name,
             "num_images": 0,
@@ -109,9 +107,7 @@ def evaluate_dataset(
             "per_image_results": [],
         }
 
-    logger.info(
-        "Evaluating '%s' on %d images from %s", dataset_name, len(images), data_dir
-    )
+    logger.info("Evaluating '%s' on %d images from %s", dataset_name, len(images), data_dir)
 
     all_detections: list[Detection] = []
     inference_times: list[float] = []
@@ -180,9 +176,7 @@ def compare_domains(results: dict[str, dict[str, Any]]) -> pd.DataFrame:
                 "avg_confidence": round(res["avg_confidence"], 4),
                 "unique_classes": len(res["class_distribution"]),
                 "avg_inference_time_ms": round(res["avg_inference_time_ms"], 2),
-                "top_classes": ", ".join(
-                    list(res["class_distribution"].keys())[:5]
-                ),
+                "top_classes": ", ".join(list(res["class_distribution"].keys())[:5]),
             }
         )
 
@@ -241,9 +235,7 @@ def compute_domain_gap(results: dict[str, dict[str, Any]]) -> dict[str, Any]:
             pairwise_confidence_diff[pair_key] = round(conf_diff, 4)
 
             # Detection rate difference
-            rate_diff = abs(
-                res_a["avg_detections_per_image"] - res_b["avg_detections_per_image"]
-            )
+            rate_diff = abs(res_a["avg_detections_per_image"] - res_b["avg_detections_per_image"])
             pairwise_detection_rate_diff[pair_key] = round(rate_diff, 4)
 
     # Compute overall gap score (average of normalized metrics)

@@ -191,19 +191,12 @@ def _pairwise_dict_to_html(d: dict[str, float]) -> str:
         a, b = pair.split("_vs_")
         rows += f"<tr><td>{a}</td><td>{b}</td><td>{value}</td></tr>\n"
 
-    return (
-        '<table class="gap-table">\n'
-        "<tr><th>Dataset A</th><th>Dataset B</th><th>Value</th></tr>\n"
-        f"{rows}</table>"
-    )
+    return f'<table class="gap-table">\n<tr><th>Dataset A</th><th>Dataset B</th><th>Value</th></tr>\n{rows}</table>'
 
 
 def _make_metric_box(value: str, label: str) -> str:
     return (
-        '<div class="metric-box">'
-        f'<div class="metric-value">{value}</div>'
-        f'<div class="metric-label">{label}</div>'
-        "</div>"
+        f'<div class="metric-box"><div class="metric-value">{value}</div><div class="metric-label">{label}</div></div>'
     )
 
 
@@ -230,15 +223,9 @@ def generate_report(
     gap = compute_domain_gap(results)
 
     # Generate plots
-    plot_class_distribution(
-        results, output_path=output_dir / "class_distribution.png"
-    )
-    plot_confidence_distribution(
-        results, output_path=output_dir / "confidence_distribution.png"
-    )
-    plot_detection_counts(
-        results, output_path=output_dir / "detection_counts.png"
-    )
+    plot_class_distribution(results, output_path=output_dir / "class_distribution.png")
+    plot_confidence_distribution(results, output_path=output_dir / "confidence_distribution.png")
+    plot_detection_counts(results, output_path=output_dir / "detection_counts.png")
 
     # Build metric boxes
     total_images = sum(r.get("num_images", 0) for r in results.values())
@@ -262,12 +249,12 @@ def generate_report(
         <div class="summary-card">
         <h3>{name}</h3>
         <ul>
-            <li>Images processed: {res.get('num_images', 0)}</li>
-            <li>Total detections: {res.get('total_detections', 0)}</li>
-            <li>Avg detections/image: {res.get('avg_detections_per_image', 0):.2f}</li>
-            <li>Avg confidence: {res.get('avg_confidence', 0):.4f}</li>
-            <li>Avg inference time: {res.get('avg_inference_time_ms', 0):.1f} ms</li>
-            <li>Top classes: {top_classes or 'N/A'}</li>
+            <li>Images processed: {res.get("num_images", 0)}</li>
+            <li>Total detections: {res.get("total_detections", 0)}</li>
+            <li>Avg detections/image: {res.get("avg_detections_per_image", 0):.2f}</li>
+            <li>Avg confidence: {res.get("avg_confidence", 0):.4f}</li>
+            <li>Avg inference time: {res.get("avg_inference_time_ms", 0):.1f} ms</li>
+            <li>Top classes: {top_classes or "N/A"}</li>
         </ul>
         </div>
         """
@@ -280,9 +267,7 @@ def generate_report(
         overall_gap_score=gap["overall_gap_score"],
         class_overlap_table=_pairwise_dict_to_html(gap["pairwise_class_overlap"]),
         confidence_diff_table=_pairwise_dict_to_html(gap["pairwise_confidence_diff"]),
-        detection_rate_table=_pairwise_dict_to_html(
-            gap["pairwise_detection_rate_diff"]
-        ),
+        detection_rate_table=_pairwise_dict_to_html(gap["pairwise_detection_rate_diff"]),
         per_dataset_details=per_dataset_html,
     )
 
@@ -296,9 +281,7 @@ def generate_report(
         s = dict(res)
         s.pop("per_image_results", None)
         serializable[name] = s
-    results_json_path.write_text(
-        json.dumps(serializable, indent=2, default=str), encoding="utf-8"
-    )
+    results_json_path.write_text(json.dumps(serializable, indent=2, default=str), encoding="utf-8")
 
     logger.info("Report generated: %s", report_path)
     return report_path

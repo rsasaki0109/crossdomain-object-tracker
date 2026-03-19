@@ -98,9 +98,7 @@ def draw_detections(
 
         # Draw label background
         label = f"{det.class_name} {det.confidence:.2f}"
-        (label_w, label_h), baseline = cv2.getTextSize(
-            label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, 1
-        )
+        (label_w, label_h), baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, 1)
         cv2.rectangle(
             image,
             (x1, y1 - label_h - baseline - 4),
@@ -152,9 +150,7 @@ def plot_class_distribution(
     # Get top N classes by total count across all datasets
     total_counts: dict[str, int] = {}
     for cls in all_classes:
-        total_counts[cls] = sum(
-            res.get("class_distribution", {}).get(cls, 0) for res in results.values()
-        )
+        total_counts[cls] = sum(res.get("class_distribution", {}).get(cls, 0) for res in results.values())
     top_classes = sorted(total_counts, key=total_counts.get, reverse=True)[:top_n]  # type: ignore[arg-type]
 
     dataset_names = list(results.keys())
@@ -164,10 +160,7 @@ def plot_class_distribution(
     fig, ax = plt.subplots(figsize=(12, 6))
 
     for i, name in enumerate(dataset_names):
-        counts = [
-            results[name].get("class_distribution", {}).get(cls, 0)
-            for cls in top_classes
-        ]
+        counts = [results[name].get("class_distribution", {}).get(cls, 0) for cls in top_classes]
         offset = (i - len(dataset_names) / 2 + 0.5) * width
         ax.bar(
             x + offset,
@@ -252,15 +245,9 @@ def plot_detection_counts(
         return
 
     metrics = {
-        "Avg Detections/Image": [
-            results[n].get("avg_detections_per_image", 0) for n in dataset_names
-        ],
-        "Avg Confidence": [
-            results[n].get("avg_confidence", 0) for n in dataset_names
-        ],
-        "Unique Classes": [
-            len(results[n].get("class_distribution", {})) for n in dataset_names
-        ],
+        "Avg Detections/Image": [results[n].get("avg_detections_per_image", 0) for n in dataset_names],
+        "Avg Confidence": [results[n].get("avg_confidence", 0) for n in dataset_names],
+        "Unique Classes": [len(results[n].get("class_distribution", {})) for n in dataset_names],
     }
 
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))

@@ -27,9 +27,7 @@ def build_parser() -> argparse.ArgumentParser:
         description="Cross-domain object detection and tracking evaluation tool for robotics datasets.",
     )
     parser.add_argument("--version", action="version", version="%(prog)s 0.1.0")
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose logging"
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
@@ -41,9 +39,7 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="Dataset name (covla, polaris, mcd, hm3d-ovon) or 'all'",
     )
-    dl.add_argument(
-        "--output", type=str, default="data/", help="Output directory"
-    )
+    dl.add_argument("--output", type=str, default="data/", help="Output directory")
     dl.add_argument(
         "--max-samples",
         type=int,
@@ -58,24 +54,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     # detect
     det = subparsers.add_parser("detect", help="Run detection on a dataset")
-    det.add_argument(
-        "--model", type=str, default="yolov8n", help="Detection model name"
-    )
-    det.add_argument(
-        "--dataset", type=str, required=True, help="Dataset name"
-    )
-    det.add_argument(
-        "--data-dir", type=str, required=True, help="Data directory"
-    )
-    det.add_argument(
-        "--output", type=str, default="outputs/", help="Output directory"
-    )
-    det.add_argument(
-        "--confidence", type=float, default=0.25, help="Confidence threshold"
-    )
-    det.add_argument(
-        "--max-samples", type=int, default=50, help="Max images to process"
-    )
+    det.add_argument("--model", type=str, default="yolov8n", help="Detection model name")
+    det.add_argument("--dataset", type=str, required=True, help="Dataset name")
+    det.add_argument("--data-dir", type=str, required=True, help="Data directory")
+    det.add_argument("--output", type=str, default="outputs/", help="Output directory")
+    det.add_argument("--confidence", type=float, default=0.25, help="Confidence threshold")
+    det.add_argument("--max-samples", type=int, default=50, help="Max images to process")
     det.add_argument(
         "--text-prompt",
         type=str,
@@ -85,42 +69,22 @@ def build_parser() -> argparse.ArgumentParser:
 
     # evaluate
     ev = subparsers.add_parser("evaluate", help="Run cross-domain evaluation")
-    ev.add_argument(
-        "--model", type=str, default="yolov8n", help="Detection model name"
-    )
-    ev.add_argument(
-        "--datasets", nargs="+", default=None, help="Datasets to evaluate on"
-    )
-    ev.add_argument(
-        "--data-dir", type=str, default="data/", help="Data root directory"
-    )
-    ev.add_argument(
-        "--output-dir", type=str, default="outputs/", help="Output directory"
-    )
-    ev.add_argument(
-        "--confidence", type=float, default=0.25, help="Confidence threshold"
-    )
-    ev.add_argument(
-        "--max-samples", type=int, default=50, help="Max images per dataset"
-    )
+    ev.add_argument("--model", type=str, default="yolov8n", help="Detection model name")
+    ev.add_argument("--datasets", nargs="+", default=None, help="Datasets to evaluate on")
+    ev.add_argument("--data-dir", type=str, default="data/", help="Data root directory")
+    ev.add_argument("--output-dir", type=str, default="outputs/", help="Output directory")
+    ev.add_argument("--confidence", type=float, default=0.25, help="Confidence threshold")
+    ev.add_argument("--max-samples", type=int, default=50, help="Max images per dataset")
 
     # visualize
     vis = subparsers.add_parser("visualize", help="Generate visualizations")
-    vis.add_argument(
-        "--results", type=str, required=True, help="Path to results JSON"
-    )
-    vis.add_argument(
-        "--output", type=str, default="outputs/plots/", help="Output directory"
-    )
+    vis.add_argument("--results", type=str, required=True, help="Path to results JSON")
+    vis.add_argument("--output", type=str, default="outputs/plots/", help="Output directory")
 
     # report
     rp = subparsers.add_parser("report", help="Generate evaluation report")
-    rp.add_argument(
-        "--results", type=str, required=True, help="Path to results JSON"
-    )
-    rp.add_argument(
-        "--output", type=str, default="outputs/report/", help="Output directory"
-    )
+    rp.add_argument("--results", type=str, required=True, help="Path to results JSON")
+    rp.add_argument("--output", type=str, default="outputs/report/", help="Output directory")
 
     return parser
 
@@ -261,9 +225,7 @@ def _cmd_visualize(args: argparse.Namespace) -> None:
     plot_class_distribution(results, output_path=output_dir / "class_distribution.png")
     print(f"  Saved: {output_dir / 'class_distribution.png'}")
 
-    plot_confidence_distribution(
-        results, output_path=output_dir / "confidence_distribution.png"
-    )
+    plot_confidence_distribution(results, output_path=output_dir / "confidence_distribution.png")
     print(f"  Saved: {output_dir / 'confidence_distribution.png'}")
 
     plot_detection_counts(results, output_path=output_dir / "detection_counts.png")
@@ -317,6 +279,7 @@ def main(argv: list[str] | None = None) -> None:
         print(f"Error: {exc}", file=sys.stderr)
         if args.verbose:
             import traceback
+
             traceback.print_exc()
         sys.exit(1)
 
