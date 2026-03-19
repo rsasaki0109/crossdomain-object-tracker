@@ -66,6 +66,8 @@ def evaluate_dataset(
     data_dir: str | Path,
     max_samples: int = 50,
     conf: float = 0.25,
+    text_prompt: str | None = None,
+    domain: str | None = None,
 ) -> dict[str, Any]:
     """Run detector on a dataset and collect results.
 
@@ -75,6 +77,8 @@ def evaluate_dataset(
         data_dir: Directory containing dataset images.
         max_samples: Maximum number of images to process.
         conf: Detection confidence threshold.
+        text_prompt: Text prompt for open-vocabulary detectors (e.g. Grounding DINO).
+        domain: Domain hint for default prompt lookup.
 
     Returns:
         Dictionary with evaluation statistics:
@@ -116,8 +120,15 @@ def evaluate_dataset(
 
     for img_path in images:
         t0 = time.perf_counter()
+        # Build extra kwargs for open-vocabulary detectors
+        detect_kwargs: dict[str, Any] = {"conf": conf}
+        if text_prompt is not None:
+            detect_kwargs["text_prompt"] = text_prompt
+        if domain is not None:
+            detect_kwargs["domain"] = domain
+
         try:
-            dets = detector.detect(img_path, conf=conf)
+            dets = detector.detect(img_path, **detect_kwargs)
         except Exception as exc:
             logger.warning("Detection failed on %s: %s", img_path, exc)
             dets = []
