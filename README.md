@@ -59,11 +59,29 @@ crossdomain-tracker visualize --results outputs/results.csv
 crossdomain-tracker report --results outputs/results.csv --format markdown
 ```
 
+## Hugging Face Spaces
+
+Try the demo online (no installation required):
+[Open in Hugging Face Spaces](https://huggingface.co/spaces/rsasaki0109/crossdomain-object-tracker)
+
 ## Demo App
 
 ```bash
 pip install -e ".[app]"
 streamlit run app.py
+```
+
+## Docker
+
+```bash
+# Build and run with GPU
+docker compose up
+
+# Or run CLI commands
+docker compose run tracker crossdomain-tracker detect --model yolov8n --data-dir data/ --output outputs/
+
+# CPU only
+docker compose run tracker crossdomain-tracker evaluate --model yolov8n --datasets covla --data-dir data/
 ```
 
 ## Architecture
