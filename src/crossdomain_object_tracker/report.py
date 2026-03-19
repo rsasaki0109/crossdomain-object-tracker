@@ -285,3 +285,162 @@ def generate_report(
 
     logger.info("Report generated: %s", report_path)
     return report_path
+
+
+def _escape_latex(text: str) -> str:
+    """Escape LaTeX special characters in a string."""
+    replacements = [
+        ("\\", "\\textbackslash{}"),
+        ("&", "\\&"),
+        ("%", "\\%"),
+        ("$", "\\$"),
+        ("#", "\\#"),
+        ("_", "\\_"),
+        ("{", "\\{"),
+        ("}", "\\}"),
+        ("~", "\\textasciitilde{}"),
+        ("^", "\\textasciicircum{}"),
+    ]
+    for old, new in replacements:
+        text = text.replace(old, new)
+    return text
+
+
+def generate_latex_table(
+    results: dict[str, dict[str, Any]],
+    output_path: str | Path | None = None,
+) -> str:
+    """Generate a publication-ready LaTeX summary table from evaluation results.
+
+    Args:
+        results: Dictionary mapping dataset names to evaluation results
+            (same format as generate_report).
+        output_path: Optional path to save the .tex file.
+
+    Returns:
+        LaTeX table string.
+    """
+    lines: list[str] = []
+    lines.append("\\begin{table}[t]")
+    lines.append("\\centering")
+    lines.append("\\caption{Cross-domain object detection results.}")
+    lines.append("\\label{tab:crossdomain-results}")
+    lines.append("\\begin{tabular}{lcccccc}")
+    lines.append("\\toprule")
+    lines.append("Domain & Images & Detections & Det/Img & Avg Conf. & Classes & Top Class \\\\")
+    lines.append("\\midrule")
+
+    total_images = 0
+    total_detections = 0
+    all_confidences: list[float] = []
+
+    for name, res in results.items():
+        num_images = res.get("num_images", 0)
+        total_dets = res.get("total_detections", 0)
+        avg_det = res.get("avg_detections_per_image", 0.0)
+        avg_conf = res.get("avg_confidence", 0.0)
+        class_dist = res.get("class_distribution", {})
+        num_classes = len(class_dist)
+        top_class = next(iter(class_dist), "-")
+
+        total_images += num_images
+        total_detections += total_dets
+        # Weight confidence by number of detections for correct overall average
+        if total_dets > 0:
+            all_confidences.extend([avg_conf] * total_dets)
+
+        escaped_name = _escape_latex(name)
+        escaped_top = _escape_latex(top_class)
+        lines.append(
+            f"{escaped_name} & {num_images} & {total_dets} & {avg_det:.2f} "
+            f"& {avg_conf:.3f} & {num_classes} & {escaped_top} \\\\"
+        )
+
+    # Total/Avg row
+    avg_det_overall = total_detections / total_images if total_images > 0 else 0.0
+    avg_conf_overall = sum(all_confidences) / len(all_confidences) if all_confidences else 0.0
+    lines.append("\\midrule")
+    lines.append(
+        f"\\textbf{{Total/Avg}} & \\textbf{{{total_images}}} & \\textbf{{{total_detections}}} "
+        f"& \\textbf{{{avg_det_overall:.2f}}} & \\textbf{{{avg_conf_overall:.3f}}} "
+        f"& \\textbf{{-}} & \\textbf{{-}} \\\\"
+    )
+
+    lines.append("\\bottomrule")
+    lines.append("\\end{tabular}")
+    lines.append("\\end{table}")
+
+    latex = "\n".join(lines)
+
+    if output_path is not None:
+        output_path = Path(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(latex, encoding="utf-8")
+        logger.info("LaTeX summary table saved to %s", output_path)
+
+    return latex
+
+
+def generate_latex_class_table(
+    results: dict[str, dict[str, Any]],
+    output_path: str | Path | None = None,
+) -> str:
+    """Generate a per-class breakdown LaTeX table from evaluation results.
+
+    Args:
+        results: Dictionary mapping dataset names to evaluation results
+            (same format as generate_report).
+        output_path: Optional path to save the .tex file.
+
+    Returns:
+        LaTeX table string.
+    """
+    dataset_names = list(results.keys())
+
+    # Collect all classes and their per-domain counts
+    class_totals: dict[str, int] = {}
+    class_per_domain: dict[str, dict[str, int]] = {}
+    for name, res in results.items():
+        class_dist = res.get("class_distribution", {})
+        for cls, count in class_dist.items():
+            class_totals[cls] = class_totals.get(cls, 0) + count
+            if cls not in class_per_domain:
+                class_per_domain[cls] = {}
+            class_per_domain[cls][name] = count
+
+    # Sort classes by total count descending
+    sorted_classes = sorted(class_totals.keys(), key=lambda c: class_totals[c], reverse=True)
+
+    n_domains = len(dataset_names)
+    col_spec = "l" + "*{" + str(n_domains) + "}{c}" + "c"
+    escaped_headers = [_escape_latex(n) for n in dataset_names]
+
+    lines: list[str] = []
+    lines.append("\\begin{table}[t]")
+    lines.append("\\centering")
+    lines.append("\\caption{Per-class detection counts across domains.}")
+    lines.append("\\label{tab:class-breakdown}")
+    lines.append(f"\\begin{{tabular}}{{{col_spec}}}")
+    lines.append("\\toprule")
+    lines.append("Class & " + " & ".join(escaped_headers) + " & Total \\\\")
+    lines.append("\\midrule")
+
+    for cls in sorted_classes:
+        escaped_cls = _escape_latex(cls)
+        counts = [str(class_per_domain.get(cls, {}).get(name, 0)) for name in dataset_names]
+        total = str(class_totals[cls])
+        lines.append(f"{escaped_cls} & " + " & ".join(counts) + f" & {total} \\\\")
+
+    lines.append("\\bottomrule")
+    lines.append("\\end{tabular}")
+    lines.append("\\end{table}")
+
+    latex = "\n".join(lines)
+
+    if output_path is not None:
+        output_path = Path(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(latex, encoding="utf-8")
+        logger.info("LaTeX class table saved to %s", output_path)
+
+    return latex

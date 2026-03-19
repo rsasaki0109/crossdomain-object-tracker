@@ -59,6 +59,13 @@ crossdomain-tracker visualize --results outputs/results.csv
 crossdomain-tracker report --results outputs/results.csv --format markdown
 ```
 
+## Demo App
+
+```bash
+pip install -e ".[app]"
+streamlit run app.py
+```
+
 ## Architecture
 
 ```

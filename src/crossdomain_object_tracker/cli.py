@@ -86,6 +86,18 @@ def build_parser() -> argparse.ArgumentParser:
     rp.add_argument("--results", type=str, required=True, help="Path to results JSON")
     rp.add_argument("--output", type=str, default="outputs/report/", help="Output directory")
 
+    # latex
+    lx = subparsers.add_parser("latex", help="Generate LaTeX tables from results")
+    lx.add_argument("--results", type=str, required=True, help="Path to results JSON")
+    lx.add_argument("--output", type=str, default=None, help="Output .tex file (default: print to stdout)")
+    lx.add_argument(
+        "--type",
+        type=str,
+        choices=["summary", "class", "both"],
+        default="both",
+        help="Table type: summary, class, or both (default: both)",
+    )
+
     return parser
 
 
@@ -246,6 +258,33 @@ def _cmd_report(args: argparse.Namespace) -> None:
     print(f"Report generated: {report_path}")
 
 
+def _cmd_latex(args: argparse.Namespace) -> None:
+    """Handle the 'latex' subcommand."""
+    from crossdomain_object_tracker.evaluate import load_results
+    from crossdomain_object_tracker.report import (
+        generate_latex_class_table,
+        generate_latex_table,
+    )
+
+    results = load_results(args.results)
+
+    parts: list[str] = []
+    if args.type in ("summary", "both"):
+        parts.append(generate_latex_table(results))
+    if args.type in ("class", "both"):
+        parts.append(generate_latex_class_table(results))
+
+    latex_output = "\n\n".join(parts)
+
+    if args.output:
+        output_path = Path(args.output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(latex_output, encoding="utf-8")
+        print(f"LaTeX tables saved to: {output_path}")
+    else:
+        print(latex_output)
+
+
 def main(argv: list[str] | None = None) -> None:
     """Entry point for the CLI."""
     parser = build_parser()
@@ -266,6 +305,7 @@ def main(argv: list[str] | None = None) -> None:
         "evaluate": _cmd_evaluate,
         "visualize": _cmd_visualize,
         "report": _cmd_report,
+        "latex": _cmd_latex,
     }
 
     handler = handlers.get(args.command)
