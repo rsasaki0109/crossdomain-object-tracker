@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cross-Domain Object Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-primary: #1a1a2e;
+  --bg-card: #16213e;
+  --bg-card-hover: #1c2a4a;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border: #2d3a5a;
+  --maritime: #0ea5e9;
+  --driving: #f59e0b;
+  --campus: #10b981;
+  --indoor: #8b5cf6;
+  --header-height: 64px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Header */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(22, 33, 62, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+}
+
+.header-inner {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-brand h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--maritime), var(--indoor));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header-nav {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.header-nav a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.header-nav a:hover { color: var(--text-primary); }
+
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary) !important;
+  transition: all 0.2s;
+}
+
+.github-link:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary) !important;
+}
+
+.github-link svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 4rem 2rem 3rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Sections */
+.section {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 2rem 4rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.section-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+/* Domain Cards */
+.domain-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.domain-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.domain-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--card-accent);
+  opacity: 0.8;
+}
+
+.domain-card:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+
+.domain-card.active {
+  border-color: var(--card-accent);
+  box-shadow: 0 0 20px rgba(var(--card-accent-rgb), 0.15);
+}
+
+.domain-card .emoji {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.domain-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.domain-card .dataset {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.domain-card .description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.domain-card .stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.domain-card .stat {
+  background: rgba(255,255,255,0.03);
+  padding: 0.5rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.domain-card .stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--card-accent);
+}
+
+.domain-card .stat-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Charts */
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+  gap: 1.5rem;
+}
+
+.chart-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+.chart-container.full-width {
+  grid-column: 1 / -1;
+}
+
+.chart-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.plotly-chart {
+  width: 100%;
+  min-height: 400px;
+}
+
+/* Gap Analysis Table */
+.gap-table-wrapper {
+  overflow-x: auto;
+  margin-top: 1.5rem;
+}
+
+.gap-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.gap-table th, .gap-table td {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.gap-table th {
+  background: rgba(255,255,255,0.05);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.gap-table td {
+  color: var(--text-secondary);
+}
+
+/* Gallery */
+.gallery-tabs {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.gallery-tab {
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gallery-tab:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+.gallery-tab.active { background: var(--tab-color, var(--text-primary)); color: var(--bg-primary); border-color: transparent; }
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.gallery-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.gallery-item:hover { transform: translateY(-2px); }
+
+.gallery-item svg {
+  width: 100%;
+  display: block;
+}
+
+.gallery-item .info {
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 2rem;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.footer p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  max-width: 700px;
+  margin: 0.5rem auto;
+  line-height: 1.6;
+}
+
+.footer .citations {
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+}
+
+.animate-in:nth-child(1) { animation-delay: 0.05s; }
+.animate-in:nth-child(2) { animation-delay: 0.1s; }
+.animate-in:nth-child(3) { animation-delay: 0.15s; }
+.animate-in:nth-child(4) { animation-delay: 0.2s; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-nav a:not(.github-link) { display: none; }
+  .hero h2 { font-size: 1.75rem; }
+  .chart-grid { grid-template-columns: 1fr; }
+  .domain-cards { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 480px) {
+  .domain-cards { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <h1>Cross-Domain Object Tracker</h1>
+    </div>
+    <nav class="header-nav">
+      <a href="#domains">Domains</a>
+      <a href="#results">Results</a>
+      <a href="#gap-analysis">Gap Analysis</a>
+      <a href="#gallery">Gallery</a>
+      <a href="https://github.com/rsasaki0109/crossdomain-object-tracker" target="_blank" class="github-link">
+        <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </nav>
+  </div>
+</header>
+
+<!-- Hero -->
+<div class="hero">
+  <h2>Cross-Domain Object Tracker</h2>
+  <p>Interactive visualization of object detection across robotics domains. Explore detection results from Maritime, Autonomous Driving, Multi-Campus, and Indoor Navigation environments.</p>
+</div>
+
+<!-- Domain Overview -->
+<section class="section" id="domains">
+  <h2 class="section-title">Domain Overview</h2>
+  <p class="section-subtitle">Select a domain to highlight its data across all visualizations</p>
+  <div class="domain-cards" id="domainCards"></div>
+</section>
+
+<!-- Detection Results -->
+<section class="section" id="results">
+  <h2 class="section-title">Detection Results Comparison</h2>
+  <p class="section-subtitle">Interactive charts showing cross-domain object detection analysis</p>
+  <div class="chart-grid">
+    <div class="chart-container full-width">
+      <div class="chart-title">Detections per Class by Domain</div>
+      <div id="barChart" class="plotly-chart"></div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-title">Confidence Score Distribution by Domain</div>
+      <div id="boxChart" class="plotly-chart"></div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-title">Domain Characteristics</div>
+      <div id="radarChart" class="plotly-chart"></div>
+    </div>
+    <div class="chart-container full-width">
+      <div class="chart-title">Class Co-occurrence by Domain</div>
+      <div id="heatmapChart" class="plotly-chart"></div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-title">Confidence vs Detection Count per Image</div>
+      <div id="scatterChart" class="plotly-chart"></div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-title">Detection Breakdown</div>
+      <div id="sunburstChart" class="plotly-chart"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Gap Analysis -->
+<section class="section" id="gap-analysis">
+  <h2 class="section-title">Domain Gap Analysis</h2>
+  <p class="section-subtitle">Pairwise Jaccard distance between class distributions across domains</p>
+  <div class="chart-container">
+    <div id="gapBarChart" class="plotly-chart"></div>
+  </div>
+  <div class="gap-table-wrapper">
+    <table class="gap-table" id="gapTable"></table>
+  </div>
+</section>
+
+<!-- Gallery -->
+<section class="section" id="gallery">
+  <h2 class="section-title">Sample Detection Gallery</h2>
+  <p class="section-subtitle">Simulated detection results with bounding boxes across domains</p>
+  <div class="gallery-tabs" id="galleryTabs"></div>
+  <div class="gallery-grid" id="galleryGrid"></div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <p><strong>Cross-Domain Object Tracker</strong></p>
+  <p>A research project exploring object detection generalization across diverse robotics domains, including maritime surveillance, autonomous driving, campus navigation, and indoor environments.</p>
+  <div class="citations">
+    <p>Datasets: PoLaRIS (Maritime) | CoVLA (Autonomous Driving) | MCD (Multi-Campus) | HM3D-OVON (Indoor Navigation)</p>
+    <p>Built with Plotly.js | Source on <a href="https://github.com/rsasaki0109/crossdomain-object-tracker" style="color:var(--maritime);">GitHub</a></p>
+  </div>
+</footer>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+
+function generateConfidences(n, mean, std) {
+  const vals = [];
+  for (let i = 0; i < n; i++) {
+    let u1 = Math.random(), u2 = Math.random();
+    let z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    let v = mean + z * std;
+    vals.push(Math.max(0.15, Math.min(0.99, v)));
+  }
+  return vals;
+}
+
+const domainData = {
+  maritime: {
+    name: "Maritime (PoLaRIS)",
+    key: "maritime",
+    color: "#0ea5e9",
+    emoji: "\u26F5",
+    description: "Object detection in harbor and open-water maritime environments. Specialized classes include vessels, buoys, and navigation aids.",
+    classes: { person: 12, boat: 45, buoy: 38, ship: 22, kayak: 8, dock: 15, bird: 5, car: 3, bicycle: 0, truck: 0, traffic_light: 0, bus: 0, motorcycle: 0, bench: 2, backpack: 1, dog: 0, skateboard: 0, chair: 1, table: 0, couch: 0, tv: 0, book: 0, bottle: 2, plant: 0 },
+    confidences: generateConfidences(60, 0.78, 0.12),
+    images: 120,
+    avgDetectionsPerImage: 3.2,
+    uniqueClasses: 12,
+    detectionDensity: 2.8,
+    avgObjectSize: 45
+  },
+  driving: {
+    name: "Driving (CoVLA)",
+    key: "driving",
+    color: "#f59e0b",
+    emoji: "\uD83D\uDE97",
+    description: "Urban and highway autonomous driving scenarios. Rich in traffic participants and infrastructure elements.",
+    classes: { person: 89, car: 156, bicycle: 23, truck: 34, traffic_light: 67, bus: 12, motorcycle: 18, boat: 0, buoy: 0, ship: 0, kayak: 0, dock: 0, bird: 3, bench: 5, backpack: 2, dog: 1, skateboard: 0, chair: 0, table: 0, couch: 0, tv: 0, book: 0, bottle: 0, plant: 0 },
+    confidences: generateConfidences(60, 0.82, 0.10),
+    images: 200,
+    avgDetectionsPerImage: 5.1,
+    uniqueClasses: 11,
+    detectionDensity: 5.5,
+    avgObjectSize: 38
+  },
+  campus: {
+    name: "Campus (MCD)",
+    key: "campus",
+    color: "#10b981",
+    emoji: "\uD83C\uDFEB",
+    description: "Multi-campus outdoor environments with pedestrians, cyclists, and campus infrastructure across different universities.",
+    classes: { person: 134, bicycle: 45, car: 28, bench: 19, backpack: 22, dog: 8, skateboard: 5, boat: 0, buoy: 0, ship: 0, kayak: 0, dock: 0, bird: 6, truck: 3, traffic_light: 4, bus: 2, motorcycle: 7, chair: 3, table: 2, couch: 0, tv: 0, book: 1, bottle: 4, plant: 8 },
+    confidences: generateConfidences(60, 0.75, 0.14),
+    images: 150,
+    avgDetectionsPerImage: 4.0,
+    uniqueClasses: 17,
+    detectionDensity: 4.2,
+    avgObjectSize: 32
+  },
+  indoor: {
+    name: "Indoor (HM3D-OVON)",
+    key: "indoor",
+    color: "#8b5cf6",
+    emoji: "\uD83C\uDFE0",
+    description: "Indoor navigation in photorealistic 3D environments. Focus on furniture, appliances, and household objects.",
+    classes: { chair: 78, table: 45, couch: 23, tv: 12, book: 34, bottle: 28, plant: 15, person: 5, boat: 0, buoy: 0, ship: 0, kayak: 0, dock: 0, bird: 0, car: 0, bicycle: 0, truck: 0, traffic_light: 0, bus: 0, motorcycle: 0, bench: 3, backpack: 2, dog: 0, skateboard: 0 },
+    confidences: generateConfidences(60, 0.80, 0.11),
+    images: 180,
+    avgDetectionsPerImage: 2.8,
+    uniqueClasses: 10,
+    detectionDensity: 3.0,
+    avgObjectSize: 52
+  }
+};
+
+const domainKeys = Object.keys(domainData);
+let activeDomain = null;
+
+const plotlyLayout = {
+  paper_bgcolor: 'rgba(0,0,0,0)',
+  plot_bgcolor: 'rgba(0,0,0,0)',
+  font: { family: 'Inter, sans-serif', color: '#94a3b8', size: 12 },
+  margin: { t: 30, r: 30, b: 60, l: 60 },
+  xaxis: { gridcolor: '#2d3a5a', zerolinecolor: '#2d3a5a' },
+  yaxis: { gridcolor: '#2d3a5a', zerolinecolor: '#2d3a5a' },
+  legend: { bgcolor: 'rgba(0,0,0,0)', font: { color: '#94a3b8' } }
+};
+
+const plotlyConfig = { responsive: true, displayModeBar: false };
+
+// ============================================================
+// DOMAIN CARDS
+// ============================================================
+
+function renderDomainCards() {
+  const container = document.getElementById('domainCards');
+  container.innerHTML = domainKeys.map(key => {
+    const d = domainData[key];
+    const totalDetections = Object.values(d.classes).reduce((a, b) => a + b, 0);
+    const avgConf = (d.confidences.reduce((a, b) => a + b, 0) / d.confidences.length).toFixed(2);
+    return `
+      <div class="domain-card animate-in" style="--card-accent:${d.color}" data-domain="${key}" onclick="toggleDomain('${key}')">
+        <span class="emoji">${d.emoji}</span>
+        <h3>${d.name.split(' (')[0]}</h3>
+        <div class="dataset">${d.name.split('(')[1]?.replace(')', '') || ''}</div>
+        <div class="description">${d.description}</div>
+        <div class="stats">
+          <div class="stat"><div class="stat-value">${d.images}</div><div class="stat-label">Images</div></div>
+          <div class="stat"><div class="stat-value">${totalDetections}</div><div class="stat-label">Detections</div></div>
+          <div class="stat"><div class="stat-value">${avgConf}</div><div class="stat-label">Avg Conf</div></div>
+          <div class="stat"><div class="stat-value">${d.uniqueClasses}</div><div class="stat-label">Classes</div></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleDomain(key) {
+  const cards = document.querySelectorAll('.domain-card');
+  if (activeDomain === key) {
+    activeDomain = null;
+    cards.forEach(c => c.classList.remove('active'));
+  } else {
+    activeDomain = key;
+    cards.forEach(c => {
+      c.classList.toggle('active', c.dataset.domain === key);
+    });
+  }
+  renderAllCharts();
+}
+
+// ============================================================
+// CHART: Grouped Bar
+// ============================================================
+
+function renderBarChart() {
+  const allClasses = new Set();
+  domainKeys.forEach(k => Object.keys(domainData[k].classes).forEach(c => { if (domainData[k].classes[c] > 0) allClasses.add(c); }));
+  const classes = [...allClasses].sort();
+
+  const traces = domainKeys.map(k => {
+    const d = domainData[k];
+    return {
+      name: d.name.split(' (')[0],
+      x: classes,
+      y: classes.map(c => d.classes[c] || 0),
+      type: 'bar',
+      marker: { color: d.color, opacity: activeDomain && activeDomain !== k ? 0.2 : 0.85 }
+    };
+  });
+
+  Plotly.newPlot('barChart', traces, {
+    ...plotlyLayout,
+    barmode: 'group',
+    xaxis: { ...plotlyLayout.xaxis, tickangle: -45 },
+    yaxis: { ...plotlyLayout.yaxis, title: 'Detection Count' },
+    legend: { ...plotlyLayout.legend, orientation: 'h', y: 1.12 }
+  }, plotlyConfig);
+}
+
+// ============================================================
+// CHART: Box Plot
+// ============================================================
+
+function renderBoxChart() {
+  const traces = domainKeys.map(k => {
+    const d = domainData[k];
+    return {
+      y: d.confidences,
+      name: d.name.split(' (')[0],
+      type: 'box',
+      marker: { color: d.color },
+      opacity: activeDomain && activeDomain !== k ? 0.2 : 1,
+      boxpoints: 'outliers'
+    };
+  });
+
+  Plotly.newPlot('boxChart', traces, {
+    ...plotlyLayout,
+    yaxis: { ...plotlyLayout.yaxis, title: 'Confidence Score', range: [0, 1.05] },
+    showlegend: false
+  }, plotlyConfig);
+}
+
+// ============================================================
+// CHART: Radar
+// ============================================================
+
+function renderRadarChart() {
+  const categories = ['Num Objects', 'Avg Confidence', 'Unique Classes', 'Detection Density', 'Avg Object Size'];
+
+  const maxVals = {
+    numObj: Math.max(...domainKeys.map(k => Object.values(domainData[k].classes).reduce((a, b) => a + b, 0))),
+    conf: 1,
+    unique: Math.max(...domainKeys.map(k => domainData[k].uniqueClasses)),
+    density: Math.max(...domainKeys.map(k => domainData[k].detectionDensity)),
+    size: Math.max(...domainKeys.map(k => domainData[k].avgObjectSize))
+  };
+
+  const traces = domainKeys.map(k => {
+    const d = domainData[k];
+    const total = Object.values(d.classes).reduce((a, b) => a + b, 0);
+    const avgConf = d.confidences.reduce((a, b) => a + b, 0) / d.confidences.length;
+    const r = [
+      total / maxVals.numObj,
+      avgConf / maxVals.conf,
+      d.uniqueClasses / maxVals.unique,
+      d.detectionDensity / maxVals.density,
+      d.avgObjectSize / maxVals.size
+    ];
+    return {
+      type: 'scatterpolar',
+      r: [...r, r[0]],
+      theta: [...categories, categories[0]],
+      fill: 'toself',
+      name: d.name.split(' (')[0],
+      fillcolor: d.color + '20',
+      line: { color: d.color },
+      opacity: activeDomain && activeDomain !== k ? 0.15 : 0.9
+    };
+  });
+
+  Plotly.newPlot('radarChart', traces, {
+    ...plotlyLayout,
+    polar: {
+      bgcolor: 'rgba(0,0,0,0)',
+      radialaxis: { visible: true, range: [0, 1], gridcolor: '#2d3a5a', linecolor: '#2d3a5a', tickfont: { size: 10 } },
+      angularaxis: { gridcolor: '#2d3a5a', linecolor: '#2d3a5a' }
+    },
+    legend: { ...plotlyLayout.legend, orientation: 'h', y: -0.15 },
+    margin: { t: 40, r: 60, b: 60, l: 60 }
+  }, plotlyConfig);
+}
+
+// ============================================================
+// CHART: Heatmap
+// ============================================================
+
+function renderHeatmapChart() {
+  const topClasses = ['person', 'car', 'bicycle', 'boat', 'chair', 'table', 'truck', 'buoy', 'ship', 'traffic_light', 'bus', 'bench', 'backpack', 'couch', 'book', 'bottle', 'plant', 'dog', 'motorcycle'];
+  const z = domainKeys.map(k => topClasses.map(c => domainData[k].classes[c] || 0));
+  const domainNames = domainKeys.map(k => domainData[k].name.split(' (')[0]);
+
+  Plotly.newPlot('heatmapChart', [{
+    z: z,
+    x: topClasses,
+    y: domainNames,
+    type: 'heatmap',
+    colorscale: [
+      [0, '#1a1a2e'],
+      [0.2, '#1e3a5f'],
+      [0.5, '#0ea5e9'],
+      [0.8, '#f59e0b'],
+      [1, '#ef4444']
+    ],
+    hoverongaps: false,
+    hovertemplate: 'Domain: %{y}<br>Class: %{x}<br>Count: %{z}<extra></extra>'
+  }], {
+    ...plotlyLayout,
+    xaxis: { ...plotlyLayout.xaxis, tickangle: -45 },
+    margin: { t: 30, r: 30, b: 80, l: 100 }
+  }, plotlyConfig);
+}
+
+// ============================================================
+// CHART: Scatter
+// ============================================================
+
+function renderScatterChart() {
+  const traces = domainKeys.map(k => {
+    const d = domainData[k];
+    const n = d.images;
+    const xs = [], ys = [], texts = [];
+    for (let i = 0; i < Math.min(n, 40); i++) {
+      const numDet = Math.max(1, Math.round(d.avgDetectionsPerImage + (Math.random() - 0.5) * 4));
+      const avgConf = d.confidences[i % d.confidences.length] + (Math.random() - 0.5) * 0.08;
+      xs.push(numDet);
+      ys.push(Math.max(0.2, Math.min(0.99, avgConf)));
+      texts.push(`Image ${i + 1}<br>${d.name.split(' (')[0]}<br>Detections: ${numDet}`);
+    }
+    return {
+      x: xs, y: ys, text: texts,
+      mode: 'markers',
+      type: 'scatter',
+      name: d.name.split(' (')[0],
+      marker: { color: d.color, size: 8, opacity: activeDomain && activeDomain !== k ? 0.1 : 0.7 },
+      hovertemplate: '%{text}<br>Avg Confidence: %{y:.2f}<extra></extra>'
+    };
+  });
+
+  Plotly.newPlot('scatterChart', traces, {
+    ...plotlyLayout,
+    xaxis: { ...plotlyLayout.xaxis, title: 'Number of Detections' },
+    yaxis: { ...plotlyLayout.yaxis, title: 'Average Confidence', range: [0.2, 1.05] },
+    legend: { ...plotlyLayout.legend, orientation: 'h', y: -0.2 }
+  }, plotlyConfig);
+}
+
+// ============================================================
+// CHART: Sunburst
+// ============================================================
+
+function renderSunburstChart() {
+  const labels = ['All Domains'];
+  const parents = [''];
+  const values = [0];
+  const colors = ['#1a1a2e'];
+
+  domainKeys.forEach(k => {
+    const d = domainData[k];
+    const dName = d.name.split(' (')[0];
+    const total = Object.values(d.classes).reduce((a, b) => a + b, 0);
+    labels.push(dName);
+    parents.push('All Domains');
+    values.push(total);
+    colors.push(d.color);
+
+    Object.entries(d.classes).filter(([_, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 8).forEach(([cls, cnt]) => {
+      labels.push(`${cls} (${dName.charAt(0)})`);
+      parents.push(dName);
+      values.push(cnt);
+      colors.push(d.color + 'aa');
+    });
+  });
+
+  Plotly.newPlot('sunburstChart', [{
+    type: 'sunburst',
+    labels, parents, values,
+    marker: { colors },
+    branchvalues: 'total',
+    hovertemplate: '<b>%{label}</b><br>Count: %{value}<extra></extra>',
+    textfont: { color: '#e2e8f0' }
+  }], {
+    ...plotlyLayout,
+    margin: { t: 10, r: 10, b: 10, l: 10 }
+  }, plotlyConfig);
+}
+
+// ============================================================
+// GAP ANALYSIS
+// ============================================================
+
+function jaccard(a, b) {
+  const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  let intersection = 0, union = 0;
+  allKeys.forEach(k => {
+    const va = a[k] || 0, vb = b[k] || 0;
+    intersection += Math.min(va, vb);
+    union += Math.max(va, vb);
+  });
+  return union === 0 ? 0 : 1 - intersection / union;
+}
+
+function renderGapAnalysis() {
+  const pairs = [], scores = [];
+  const matrix = {};
+
+  for (let i = 0; i < domainKeys.length; i++) {
+    for (let j = i + 1; j < domainKeys.length; j++) {
+      const ki = domainKeys[i], kj = domainKeys[j];
+      const di = domainData[ki], dj = domainData[kj];
+      const score = jaccard(di.classes, dj.classes);
+      const ni = di.name.split(' (')[0], nj = dj.name.split(' (')[0];
+      pairs.push(`${ni} vs ${nj}`);
+      scores.push(parseFloat(score.toFixed(3)));
+      if (!matrix[ki]) matrix[ki] = {};
+      if (!matrix[kj]) matrix[kj] = {};
+      matrix[ki][kj] = score;
+      matrix[kj][ki] = score;
+    }
+  }
+
+  const barColors = scores.map(s => {
+    if (s < 0.5) return '#10b981';
+    if (s < 0.7) return '#f59e0b';
+    return '#ef4444';
+  });
+
+  Plotly.newPlot('gapBarChart', [{
+    x: pairs, y: scores, type: 'bar',
+    marker: { color: barColors, opacity: 0.85 },
+    hovertemplate: '%{x}<br>Jaccard Distance: %{y:.3f}<extra></extra>'
+  }], {
+    ...plotlyLayout,
+    yaxis: { ...plotlyLayout.yaxis, title: 'Jaccard Distance', range: [0, 1] },
+    xaxis: { ...plotlyLayout.xaxis, tickangle: -30 }
+  }, plotlyConfig);
+
+  // Table
+  const domainNames = domainKeys.map(k => domainData[k].name.split(' (')[0]);
+  let html = '<thead><tr><th></th>';
+  domainNames.forEach(n => html += `<th>${n}</th>`);
+  html += '</tr></thead><tbody>';
+  domainKeys.forEach((ki, i) => {
+    html += `<tr><th style="text-align:left">${domainNames[i]}</th>`;
+    domainKeys.forEach(kj => {
+      if (ki === kj) html += '<td style="background:rgba(255,255,255,0.05)">-</td>';
+      else {
+        const val = (matrix[ki]?.[kj] || 0).toFixed(3);
+        const heat = parseFloat(val);
+        const r = Math.round(heat * 200 + 50);
+        const g = Math.round((1 - heat) * 150 + 50);
+        html += `<td style="background:rgba(${r},${g},80,0.15)">${val}</td>`;
+      }
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  document.getElementById('gapTable').innerHTML = html;
+}
+
+// ============================================================
+// GALLERY
+// ============================================================
+
+function generateBboxSVG(domainKey, imgIndex) {
+  const d = domainData[domainKey];
+  const w = 320, h = 200;
+  const bgColors = { maritime: '#0c2d48', driving: '#2d2b1e', campus: '#1a2e1a', indoor: '#2a1f3d' };
+
+  const topClasses = Object.entries(d.classes).filter(([_, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const numBoxes = 2 + Math.floor(Math.random() * 3);
+  let boxes = '';
+  const rng = (seed) => {
+    let s = seed + imgIndex * 7 + domainKey.length * 13;
+    return () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+  };
+  const rand = rng(imgIndex);
+
+  for (let b = 0; b < numBoxes; b++) {
+    const cls = topClasses[b % topClasses.length][0];
+    const bx = Math.floor(rand() * (w - 80)) + 10;
+    const by = Math.floor(rand() * (h - 60)) + 10;
+    const bw = Math.floor(rand() * 80) + 40;
+    const bh = Math.floor(rand() * 50) + 30;
+    const conf = (0.6 + rand() * 0.38).toFixed(2);
+    boxes += `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="none" stroke="${d.color}" stroke-width="2" rx="2"/>`;
+    boxes += `<rect x="${bx}" y="${by - 16}" width="${cls.length * 7 + 40}" height="16" fill="${d.color}" rx="2"/>`;
+    boxes += `<text x="${bx + 3}" y="${by - 4}" fill="#fff" font-size="10" font-family="Inter,sans-serif">${cls} ${conf}</text>`;
+  }
+
+  return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+    <rect width="${w}" height="${h}" fill="${bgColors[domainKey]}"/>
+    <text x="${w/2}" y="${h/2}" text-anchor="middle" fill="${d.color}33" font-size="40" font-family="Inter,sans-serif">${d.emoji}</text>
+    ${boxes}
+  </svg>`;
+}
+
+function renderGallery(filter) {
+  const tabs = document.getElementById('galleryTabs');
+  tabs.innerHTML = `<button class="gallery-tab ${!filter ? 'active' : ''}" style="--tab-color:#94a3b8" onclick="renderGallery(null)">All</button>`;
+  domainKeys.forEach(k => {
+    const d = domainData[k];
+    tabs.innerHTML += `<button class="gallery-tab ${filter === k ? 'active' : ''}" style="--tab-color:${d.color}" onclick="renderGallery('${k}')">${d.name.split(' (')[0]}</button>`;
+  });
+
+  const grid = document.getElementById('galleryGrid');
+  const keys = filter ? [filter] : domainKeys;
+  let html = '';
+  keys.forEach(k => {
+    const d = domainData[k];
+    const count = filter ? 6 : 3;
+    for (let i = 0; i < count; i++) {
+      html += `<div class="gallery-item">
+        ${generateBboxSVG(k, i)}
+        <div class="info">
+          <span>${d.name.split(' (')[0]} - Image ${i + 1}</span>
+          <span style="color:${d.color}">${d.emoji}</span>
+        </div>
+      </div>`;
+    }
+  });
+  grid.innerHTML = html;
+}
+
+// ============================================================
+// RENDER ALL
+// ============================================================
+
+function renderAllCharts() {
+  renderBarChart();
+  renderBoxChart();
+  renderRadarChart();
+  renderHeatmapChart();
+  renderScatterChart();
+  renderSunburstChart();
+}
+
+// Init
+renderDomainCards();
+renderAllCharts();
+renderGapAnalysis();
+renderGallery(null);
+</script>
+
+</body>
+</html>
