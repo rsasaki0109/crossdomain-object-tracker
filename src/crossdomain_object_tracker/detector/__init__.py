@@ -123,14 +123,26 @@ def get_detector(name: str, **kwargs: object) -> BaseDetector:
         model_name = name if name.endswith(".pt") else f"{name}.pt"
         return YOLODetector(model_name=model_name, **kwargs)  # type: ignore[arg-type]
 
-    elif name_lower in ("grounding_dino", "groundingdino"):
+    elif name_lower.startswith("grounding_dino") or name_lower.startswith("gdino"):
         from crossdomain_object_tracker.detector.grounding_dino import (
             GroundingDINODetector,
         )
 
+        # Map short names to HuggingFace model IDs
+        model_id_map = {
+            "grounding_dino_tiny": "IDEA-Research/grounding-dino-tiny",
+            "gdino_tiny": "IDEA-Research/grounding-dino-tiny",
+            "grounding_dino_base": "IDEA-Research/grounding-dino-base",
+            "gdino_base": "IDEA-Research/grounding-dino-base",
+        }
+        if "model_id" not in kwargs:
+            kwargs["model_id"] = model_id_map.get(  # type: ignore[assignment]
+                name_lower, "IDEA-Research/grounding-dino-tiny"
+            )
         return GroundingDINODetector(**kwargs)  # type: ignore[arg-type]
 
     else:
         raise ValueError(
-            f"Unknown detector: '{name}'. Supported: yolov8n, yolov8s, yolov8m, yolov8l, yolov8x, grounding-dino"
+            f"Unknown detector: '{name}'. Supported: yolov8n/s/m/l/x, "
+            f"grounding-dino, grounding-dino-tiny, grounding-dino-base, gdino"
         )

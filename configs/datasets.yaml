@@ -8,6 +8,7 @@ datasets:
       Contains driving scenes with rich annotations including
       natural language descriptions and planned actions.
     domain: autonomous_driving
+    default_text_prompt: "car . truck . bus . person . bicycle . motorcycle . traffic light . stop sign"
     source: Toyota Research Institute
     url: https://huggingface.co/datasets/tier4/CoVLA_Dataset
     download_method: huggingface
@@ -29,6 +30,7 @@ datasets:
       Captured in the Pohang Canal area with multi-sensor data for
       maritime autonomous surface ship perception.
     domain: maritime
+    default_text_prompt: "boat . ship . buoy . person . kayak . dock . bird . water"
     source: KAIST
     url: https://sites.google.com/view/polaris-dataset
     download_method: url
@@ -53,6 +55,7 @@ datasets:
       diverse environments. Collected at NTU (Singapore), KTH (Sweden),
       KAIST (South Korea), and other campuses with LiDAR, camera, and IMU.
     domain: campus
+    default_text_prompt: "person . bicycle . bench . backpack . dog . skateboard . tree . building"
     source: NTU / KTH / KAIST
     url: https://mcdviral.github.io/
     download_method: url
@@ -75,6 +78,7 @@ datasets:
       Indoor 3D scans with dense semantic annotations, enabling
       open-vocabulary object detection evaluation in indoor environments.
     domain: indoor
+    default_text_prompt: "chair . table . couch . tv . book . bottle . plant . lamp . bed"
     source: Meta AI / Matterport
     url: https://aihabitat.org/datasets/hm3d-semantics/
     download_method: url
@@ -97,6 +101,7 @@ datasets:
       providing multi-session multi-sensor data with as-built maps and
       as-designed BIM for registration, localization and semantic mapping tasks.
     domain: indoor/construction
+    default_text_prompt: "wall . door . window . pipe . column . person . sign . equipment"
     source: HKUST Aerial Robotics Group
     url: https://github.com/HKUST-Aerial-Robotics/SLABIM
     download_method: url
@@ -117,6 +122,7 @@ datasets:
       urban roads, covering tunnels, highways, shopping areas, and subway
       stations across 187 minutes and 75.4 km of data.
     domain: outdoor/extreme
+    default_text_prompt: "car . truck . bus . person . bicycle . building . sign . pole"
     source: HKU
     url: https://github.com/RuanJY/HK_MEMS_Dataset
     download_method: url
@@ -138,6 +144,7 @@ datasets:
       (Africa, Americas, East Asia, Europe, SE Asia, West Asia),
       collected to evaluate geographic robustness of vision models.
     domain: global/outdoor
+    default_text_prompt: "car . person . building . tree . sign . bicycle . animal . furniture"
     source: Princeton University
     url: https://geodiverse-data-collection.cs.princeton.edu/
     download_method: url

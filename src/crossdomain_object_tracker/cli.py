@@ -66,6 +66,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Text prompt for Grounding DINO (e.g. 'car . person . tree')",
     )
+    det.add_argument(
+        "--domain",
+        type=str,
+        default=None,
+        help="Domain hint for Grounding DINO default prompts (e.g. maritime, autonomous_driving, campus, indoor)",
+    )
 
     # evaluate
     ev = subparsers.add_parser("evaluate", help="Run cross-domain evaluation")
@@ -75,6 +81,18 @@ def build_parser() -> argparse.ArgumentParser:
     ev.add_argument("--output-dir", type=str, default="outputs/", help="Output directory")
     ev.add_argument("--confidence", type=float, default=0.25, help="Confidence threshold")
     ev.add_argument("--max-samples", type=int, default=50, help="Max images per dataset")
+    ev.add_argument(
+        "--text-prompt",
+        type=str,
+        default=None,
+        help="Text prompt for Grounding DINO (e.g. 'car . person . tree')",
+    )
+    ev.add_argument(
+        "--domain",
+        type=str,
+        default=None,
+        help="Domain hint for Grounding DINO default prompts (e.g. maritime, autonomous_driving, campus, indoor)",
+    )
 
     # visualize
     vis = subparsers.add_parser("visualize", help="Generate visualizations")
@@ -141,6 +159,8 @@ def _cmd_detect(args: argparse.Namespace) -> None:
         args.data_dir,
         max_samples=args.max_samples,
         conf=args.confidence,
+        text_prompt=args.text_prompt,
+        domain=args.domain,
     )
 
     output_dir = Path(args.output)
@@ -194,6 +214,8 @@ def _cmd_evaluate(args: argparse.Namespace) -> None:
             data_dir,
             max_samples=args.max_samples,
             conf=args.confidence,
+            text_prompt=args.text_prompt,
+            domain=args.domain,
         )
         results[name] = result
         print(f"  {result['total_detections']} detections in {result['num_images']} images")
