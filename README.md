@@ -6,13 +6,19 @@
 
 **Cross-domain object detection and tracking evaluation tool for robotics datasets.**
 
-Run the same object detection model (YOLOv8, Grounding DINO) across multiple robotics domains -- maritime, autonomous driving, campus, and indoor -- to quantify domain gaps and compare detection performance.
+Run the same object detection model (YOLOv8, Grounding DINO) across multiple robotics domains -- maritime, autonomous driving, campus, indoor, construction, and geographic diversity -- to quantify domain gaps and compare detection performance.
 
 ---
 
 **ロボティクス向けクロスドメイン物体検出・追跡評価ツール**
 
-同一の物体検出モデル (YOLOv8, Grounding DINO) を海上・自動運転・キャンパス・屋内の各ドメインのデータセットに適用し、ドメインギャップを定量評価・可視化します。
+同一の物体検出モデル (YOLOv8, Grounding DINO) を海上・自動運転・キャンパス・屋内・建設・地理的多様性の各ドメインのデータセットに適用し、ドメインギャップを定量評価・可視化します。
+
+## Live Demo
+
+**https://rsasaki0109.github.io/crossdomain-object-tracker/**
+
+The demo page provides interactive Plotly.js charts for cross-domain metric comparison and a YOLOv8 detection gallery showing results across different datasets. No installation required.
 
 ## Supported Datasets
 
@@ -22,6 +28,9 @@ Run the same object detection model (YOLOv8, Grounding DINO) across multiple rob
 | [CoVLA](https://huggingface.co/datasets/tali-research/CoVLA) | Autonomous Driving | Camera | Toyota Research Institute |
 | [MCD](https://mcdviral.github.io/) | Multi-Campus | Camera, LiDAR, IMU | NTU / KTH / KAIST |
 | [HM3D-OVON](https://aihabitat.org/datasets/hm3d-semantics/) | Indoor | RGB-D, 3D Semantics | Meta AI / Matterport |
+| [SLABIM](https://github.com/SLABIM) | Construction / BIM | Camera, 3D BIM Models | ETH Zurich |
+| [HK_MEMS](https://github.com/hk-mems) | Urban / MEP | Camera, LiDAR | HK PolyU |
+| [GEODE](https://geodiverse-data-collection.cs.princeton.edu/) | Geographic Diversity | Camera | Princeton |
 
 ## Installation
 

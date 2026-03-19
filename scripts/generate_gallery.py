@@ -2,7 +2,6 @@
 """Download sample images from 4 domains and run YOLOv8 detection, saving annotated images and results."""
 
 import json
-import os
 import ssl
 import urllib.request
 from pathlib import Path
@@ -43,10 +42,10 @@ SAMPLE_IMAGES = {
 
 # Domain-specific colours (BGR for OpenCV)
 DOMAIN_COLORS = {
-    "maritime": (0xE9, 0xA5, 0x0E),   # #0ea5e9
-    "driving":  (0x0B, 0x9E, 0xF5),   # #f59e0b
-    "campus":   (0x81, 0xB9, 0x10),   # #10b981
-    "indoor":   (0xF6, 0x5C, 0x8B),   # #8b5cf6
+    "maritime": (0xE9, 0xA5, 0x0E),  # #0ea5e9
+    "driving": (0x0B, 0x9E, 0xF5),  # #f59e0b
+    "campus": (0x81, 0xB9, 0x10),  # #10b981
+    "indoor": (0xF6, 0x5C, 0x8B),  # #8b5cf6
 }
 
 MODEL_NAME = "yolov8n"
@@ -75,7 +74,7 @@ def draw_detections(img: np.ndarray, detections: list, color: tuple) -> np.ndarr
     """Draw bounding boxes with labels on *img* (in-place) and return it."""
     for det in detections:
         x1, y1, x2, y2 = [int(v) for v in det["bbox"]]
-        label = f'{det["class"]} {det["confidence"]:.2f}'
+        label = f"{det['class']} {det['confidence']:.2f}"
         cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
         # Label background
         (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
@@ -136,11 +135,13 @@ def main():
                 cls_name = model.names[cls_id]
                 conf = float(box.conf[0])
                 bbox = box.xyxy[0].tolist()
-                detections.append({
-                    "class": cls_name,
-                    "confidence": round(conf, 4),
-                    "bbox": [round(v, 1) for v in bbox],
-                })
+                detections.append(
+                    {
+                        "class": cls_name,
+                        "confidence": round(conf, 4),
+                        "bbox": [round(v, 1) for v in bbox],
+                    }
+                )
                 domain_confs.append(conf)
                 grand_all_confs.append(conf)
                 domain_classes[cls_name] = domain_classes.get(cls_name, 0) + 1

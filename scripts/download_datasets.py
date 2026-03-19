@@ -25,16 +25,10 @@ from crossdomain_object_tracker.common.download import download_dataset
 
 def main() -> None:
     """Download datasets based on CLI arguments."""
-    parser = argparse.ArgumentParser(
-        description="Download datasets for cross-domain evaluation."
-    )
+    parser = argparse.ArgumentParser(description="Download datasets for cross-domain evaluation.")
     parser.add_argument("--dataset", type=str, help="Dataset name to download")
-    parser.add_argument(
-        "--all", action="store_true", help="Download all configured datasets"
-    )
-    parser.add_argument(
-        "--dest", type=str, default="data/", help="Destination directory"
-    )
+    parser.add_argument("--all", action="store_true", help="Download all configured datasets")
+    parser.add_argument("--dest", type=str, default="data/", help="Destination directory")
     parser.add_argument(
         "--max-samples",
         type=int,
@@ -46,9 +40,7 @@ def main() -> None:
         action="store_true",
         help="Download only sample images for quick testing",
     )
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose logging"
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
     args = parser.parse_args()
 
     logging.basicConfig(

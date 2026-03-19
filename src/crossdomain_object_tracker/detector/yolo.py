@@ -50,8 +50,7 @@ class YOLODetector(BaseDetector):
             from ultralytics import YOLO
         except ImportError as e:
             raise ImportError(
-                "ultralytics is required for YOLOv8 detection. "
-                "Install with: pip install ultralytics"
+                "ultralytics is required for YOLOv8 detection. Install with: pip install ultralytics"
             ) from e
 
         self._model = YOLO(self.model_name)
