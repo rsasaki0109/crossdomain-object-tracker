@@ -1,0 +1,12 @@
+.git
+.github
+__pycache__
+*.pyc
+.venv
+data/
+outputs/
+*.pt
+*.pth
+*.onnx
+.env
+notebooks/.ipynb_checkpoints

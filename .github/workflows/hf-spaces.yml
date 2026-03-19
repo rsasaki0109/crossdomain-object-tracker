@@ -1,0 +1,24 @@
+name: Sync to Hugging Face Spaces
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'hf_space/**'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Push to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          cd hf_space
+          git init
+          git config user.email "rsasaki0109@users.noreply.github.com"
+          git config user.name "rsasaki0109"
+          git add .
+          git commit -m "Update Space"
+          git push --force https://rsasaki0109:${HF_TOKEN}@huggingface.co/spaces/rsasaki0109/crossdomain-object-tracker main
