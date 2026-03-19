@@ -88,3 +88,62 @@ datasets:
       - "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=640"
       - "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=640"
       - "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=640"
+
+  slabim:
+    name: SLABIM
+    description: >-
+      SLAM-BIM Coupled Dataset in HKUST Main Building.
+      First dataset to couple SLAM with BIM (Building Information Modeling),
+      providing multi-session multi-sensor data with as-built maps and
+      as-designed BIM for registration, localization and semantic mapping tasks.
+    domain: indoor/construction
+    source: HKUST Aerial Robotics Group
+    url: https://github.com/HKUST-Aerial-Robotics/SLABIM
+    download_method: url
+    modalities:
+      - lidar
+      - camera
+      - imu
+    annotation_format: custom
+    license: research-only
+    paper_url: "https://arxiv.org/abs/2502.16856"
+    sample_images_url: []
+
+  hk_mems:
+    name: HK-MEMS
+    description: >-
+      Multi-sensor dataset with MEMS LiDAR on degenerate and dynamic urban
+      scenarios. First dataset to offer automotive-grade MEMS LiDAR data on
+      urban roads, covering tunnels, highways, shopping areas, and subway
+      stations across 187 minutes and 75.4 km of data.
+    domain: outdoor/extreme
+    source: HKU
+    url: https://github.com/RuanJY/HK_MEMS_Dataset
+    download_method: url
+    modalities:
+      - multi-lidar
+      - camera
+      - imu
+      - gnss
+    annotation_format: custom
+    license: research-only
+    paper_url: "https://onlinelibrary.wiley.com/doi/10.1002/rob.70136"
+    sample_images_url: []
+
+  geode:
+    name: GeoDE
+    description: >-
+      Geographically Diverse Evaluation Dataset for Object Recognition.
+      Contains 61,940 images from 40 classes across 6 world regions
+      (Africa, Americas, East Asia, Europe, SE Asia, West Asia),
+      collected to evaluate geographic robustness of vision models.
+    domain: global/outdoor
+    source: Princeton University
+    url: https://geodiverse-data-collection.cs.princeton.edu/
+    download_method: url
+    modalities:
+      - camera
+    annotation_format: custom
+    license: research-only
+    paper_url: "https://arxiv.org/abs/2301.02560"
+    sample_images_url: []

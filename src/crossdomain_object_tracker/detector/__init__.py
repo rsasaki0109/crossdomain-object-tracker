@@ -71,9 +71,7 @@ class BaseDetector(ABC):
     """Abstract base class for object detectors."""
 
     @abstractmethod
-    def detect(
-        self, image: Union[str, Path, np.ndarray], **kwargs: object
-    ) -> list[Detection]:
+    def detect(self, image: Union[str, Path, np.ndarray], **kwargs: object) -> list[Detection]:
         """Run detection on a single image.
 
         Args:
@@ -85,9 +83,7 @@ class BaseDetector(ABC):
         """
         ...
 
-    def detect_batch(
-        self, images: list[Union[str, Path, np.ndarray]], **kwargs: object
-    ) -> list[list[Detection]]:
+    def detect_batch(self, images: list[Union[str, Path, np.ndarray]], **kwargs: object) -> list[list[Detection]]:
         """Run detection on a batch of images.
 
         Default implementation calls detect() in a loop.
@@ -136,6 +132,5 @@ def get_detector(name: str, **kwargs: object) -> BaseDetector:
 
     else:
         raise ValueError(
-            f"Unknown detector: '{name}'. "
-            "Supported: yolov8n, yolov8s, yolov8m, yolov8l, yolov8x, grounding-dino"
+            f"Unknown detector: '{name}'. Supported: yolov8n, yolov8s, yolov8m, yolov8l, yolov8x, grounding-dino"
         )

@@ -57,14 +57,11 @@ class GroundingDINODetector(BaseDetector):
             from transformers import AutoModelForZeroShotObjectDetection, AutoProcessor
         except ImportError as e:
             raise ImportError(
-                "transformers and torch are required for Grounding DINO. "
-                "Install with: pip install transformers torch"
+                "transformers and torch are required for Grounding DINO. Install with: pip install transformers torch"
             ) from e
 
         self._processor = AutoProcessor.from_pretrained(self.model_id)
-        self._model = AutoModelForZeroShotObjectDetection.from_pretrained(
-            self.model_id
-        ).to(self.device)
+        self._model = AutoModelForZeroShotObjectDetection.from_pretrained(self.model_id).to(self.device)
 
     def detect(
         self,
@@ -107,9 +104,7 @@ class GroundingDINODetector(BaseDetector):
         text = ". ".join(categories) + "."
 
         # Process inputs
-        inputs = self._processor(
-            images=pil_image, text=text, return_tensors="pt"
-        )
+        inputs = self._processor(images=pil_image, text=text, return_tensors="pt")
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
 
         # Run inference

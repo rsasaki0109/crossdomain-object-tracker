@@ -26,29 +26,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 def main() -> None:
     """Run the demo pipeline."""
-    parser = argparse.ArgumentParser(
-        description="Run cross-domain detection demo."
-    )
-    parser.add_argument(
-        "--model", type=str, default="yolov8n", help="Model to use"
-    )
-    parser.add_argument(
-        "--data-dir", type=str, default="data/", help="Data directory"
-    )
-    parser.add_argument(
-        "--output", type=str, default="outputs/demo/", help="Output directory"
-    )
-    parser.add_argument(
-        "--max-samples", type=int, default=10, help="Max images per dataset"
-    )
+    parser = argparse.ArgumentParser(description="Run cross-domain detection demo.")
+    parser.add_argument("--model", type=str, default="yolov8n", help="Model to use")
+    parser.add_argument("--data-dir", type=str, default="data/", help="Data directory")
+    parser.add_argument("--output", type=str, default="outputs/demo/", help="Output directory")
+    parser.add_argument("--max-samples", type=int, default=10, help="Max images per dataset")
     parser.add_argument(
         "--skip-download",
         action="store_true",
         help="Skip downloading sample images",
     )
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose logging"
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -83,7 +71,7 @@ def main() -> None:
             print(f"\n  Downloading: {name}")
             try:
                 download_dataset(name, output_dir=data_dir, demo=True)
-                print(f"    Done.")
+                print("    Done.")
             except Exception as exc:
                 print(f"    Error: {exc}")
         print()
@@ -103,9 +91,7 @@ def main() -> None:
             continue
 
         print(f"\n  Processing: {name}")
-        result = evaluate_dataset(
-            detector, name, dataset_dir, max_samples=args.max_samples
-        )
+        result = evaluate_dataset(detector, name, dataset_dir, max_samples=args.max_samples)
         results[name] = result
         print(
             f"    {result['total_detections']} detections in "

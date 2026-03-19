@@ -33,21 +33,21 @@ def _download_file_requests(url: str, dest: Path, desc: str | None = None) -> Pa
         import requests
         from tqdm import tqdm
     except ImportError as e:
-        raise ImportError(
-            f"Required package not installed: {e.name}. "
-            "Install with: pip install requests tqdm"
-        ) from e
+        raise ImportError(f"Required package not installed: {e.name}. Install with: pip install requests tqdm") from e
 
     response = requests.get(url, stream=True, timeout=60)
     response.raise_for_status()
     total = int(response.headers.get("content-length", 0))
 
-    with open(dest, "wb") as f, tqdm(
-        total=total,
-        unit="B",
-        unit_scale=True,
-        desc=desc or dest.name,
-    ) as pbar:
+    with (
+        open(dest, "wb") as f,
+        tqdm(
+            total=total,
+            unit="B",
+            unit_scale=True,
+            desc=desc or dest.name,
+        ) as pbar,
+    ):
         for chunk in response.iter_content(chunk_size=8192):
             f.write(chunk)
             pbar.update(len(chunk))
@@ -114,8 +114,7 @@ def download_from_huggingface(
         from huggingface_hub import HfApi, hf_hub_download
     except ImportError as e:
         raise ImportError(
-            "huggingface_hub is required for HuggingFace downloads. "
-            "Install with: pip install huggingface-hub"
+            "huggingface_hub is required for HuggingFace downloads. Install with: pip install huggingface-hub"
         ) from e
 
     from tqdm import tqdm
@@ -175,10 +174,7 @@ def download_from_gdrive(file_id: str, output_dir: Path, filename: str) -> Path:
     try:
         import gdown
     except ImportError as e:
-        raise ImportError(
-            "gdown is required for Google Drive downloads. "
-            "Install with: pip install gdown"
-        ) from e
+        raise ImportError("gdown is required for Google Drive downloads. Install with: pip install gdown") from e
 
     _ensure_dir(output_dir)
     dest = output_dir / filename
@@ -240,8 +236,7 @@ def download_sample_images(
     sample_urls = dataset_config.get("sample_images_url", [])
     if not sample_urls:
         logger.warning(
-            "No sample image URLs configured for dataset '%s'. "
-            "You may need to download the full dataset manually.",
+            "No sample image URLs configured for dataset '%s'. You may need to download the full dataset manually.",
             dataset_name,
         )
         return []
@@ -290,9 +285,7 @@ def download_dataset(
         logger.info("Demo mode: downloading sample images for '%s'", name)
         downloaded = download_sample_images(name, output_dir, dataset_config)
         if downloaded:
-            logger.info(
-                "Downloaded %d sample images to %s", len(downloaded), dataset_dir
-            )
+            logger.info("Downloaded %d sample images to %s", len(downloaded), dataset_dir)
         else:
             logger.warning("No sample images available for '%s'", name)
         return dataset_dir
@@ -303,17 +296,13 @@ def download_dataset(
         repo_id = dataset_config.get("huggingface_repo")
         if not repo_id:
             raise ValueError(
-                f"Dataset '{name}' is configured for HuggingFace download "
-                "but no 'huggingface_repo' is specified."
+                f"Dataset '{name}' is configured for HuggingFace download but no 'huggingface_repo' is specified."
             )
         try:
-            return download_from_huggingface(
-                repo_id, dataset_dir, max_samples=max_samples
-            )
+            return download_from_huggingface(repo_id, dataset_dir, max_samples=max_samples)
         except Exception as exc:
             logger.warning(
-                "HuggingFace download failed for '%s': %s. "
-                "Falling back to sample images.",
+                "HuggingFace download failed for '%s': %s. Falling back to sample images.",
                 name,
                 exc,
             )
@@ -333,8 +322,7 @@ def download_dataset(
         # For datasets with direct URL download, fall back to sample images
         # since full datasets usually require manual download or auth
         logger.info(
-            "Dataset '%s' requires manual download from: %s. "
-            "Downloading sample images instead.",
+            "Dataset '%s' requires manual download from: %s. Downloading sample images instead.",
             name,
             dataset_config.get("url", "N/A"),
         )
