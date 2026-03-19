@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from crossdomain_object_tracker.detector import Detection
+from crossdomain_object_tracker.tracker import Track
 
 # Use non-interactive backend by default so plots can be saved without display
 matplotlib.use("Agg")
@@ -338,3 +339,126 @@ def create_detection_grid(
         cv2.imwrite(str(output_path), grid)
 
     return grid
+
+
+def plot_track_timeline(
+    tracks: list[Track],
+    output_path: str | Path | None = None,
+) -> None:
+    """Gantt-chart style visualization of tracks over time.
+
+    Each track is shown as a horizontal bar spanning the frames
+    where the object was detected.
+
+    Args:
+        tracks: List of Track objects to visualize.
+        output_path: Path to save the plot. If None, calls plt.show().
+    """
+    if not tracks:
+        return
+
+    fig, ax = plt.subplots(figsize=(14, max(4, len(tracks) * 0.4)))
+
+    for i, track in enumerate(tracks):
+        start = min(track.frames)
+        end = max(track.frames)
+        color = _get_color_rgb_norm(i)
+        ax.barh(
+            i,
+            end - start + 1,
+            left=start,
+            height=0.6,
+            color=color,
+            alpha=0.8,
+            label=f"ID {track.track_id}: {track.class_name}" if i < 20 else None,
+        )
+
+    ax.set_xlabel("Frame Index")
+    ax.set_ylabel("Track")
+    ax.set_yticks(range(len(tracks)))
+    ax.set_yticklabels([f"ID {t.track_id} ({t.class_name})" for t in tracks], fontsize=8)
+    ax.set_title("Object Track Timeline")
+    ax.grid(axis="x", alpha=0.3)
+    ax.invert_yaxis()
+    plt.tight_layout()
+
+    if output_path is not None:
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(str(output_path), dpi=150, bbox_inches="tight")
+        plt.close(fig)
+    else:
+        plt.show()
+
+
+def plot_tracking_summary(
+    metrics: dict,
+    output_path: str | Path | None = None,
+) -> None:
+    """Bar charts summarizing tracking results.
+
+    Shows class distribution and track duration statistics.
+
+    Args:
+        metrics: Tracking metrics dict from compute_tracking_metrics().
+        output_path: Path to save the plot. If None, calls plt.show().
+    """
+    classes = metrics.get("classes", {})
+    if not classes:
+        return
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+    # Class distribution
+    ax1 = axes[0]
+    class_names = list(classes.keys())
+    class_counts = list(classes.values())
+    colors = [_get_color_rgb_norm(i) for i in range(len(class_names))]
+    bars = ax1.bar(class_names, class_counts, color=colors)
+    ax1.set_xlabel("Class")
+    ax1.set_ylabel("Number of Tracks")
+    ax1.set_title("Tracks per Class")
+    ax1.grid(axis="y", alpha=0.3)
+    for bar, val in zip(bars, class_counts):
+        ax1.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height(),
+            str(val),
+            ha="center",
+            va="bottom",
+            fontsize=9,
+        )
+    if len(class_names) > 5:
+        ax1.tick_params(axis="x", rotation=45)
+
+    # Summary stats
+    ax2 = axes[1]
+    stat_names = ["Num Tracks", "Avg Duration", "Max Duration", "Total Dets"]
+    stat_values = [
+        metrics.get("num_tracks", 0),
+        metrics.get("avg_duration", 0),
+        metrics.get("max_duration", 0),
+        metrics.get("total_detections", 0),
+    ]
+    stat_colors = [_get_color_rgb_norm(i) for i in range(len(stat_names))]
+    bars2 = ax2.bar(stat_names, stat_values, color=stat_colors)
+    ax2.set_title("Tracking Statistics")
+    ax2.grid(axis="y", alpha=0.3)
+    for bar, val in zip(bars2, stat_values):
+        ax2.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height(),
+            f"{val:.1f}" if isinstance(val, float) else str(val),
+            ha="center",
+            va="bottom",
+            fontsize=9,
+        )
+
+    plt.suptitle("Tracking Summary", fontsize=14)
+    plt.tight_layout()
+
+    if output_path is not None:
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(str(output_path), dpi=150, bbox_inches="tight")
+        plt.close(fig)
+    else:
+        plt.show()
