@@ -8,7 +8,7 @@
 
 Run the same object detection model (YOLOv8, Grounding DINO) across multiple robotics domains -- maritime, autonomous driving, campus, indoor, construction, and geographic diversity -- to quantify domain gaps and compare detection performance.
 
-![Demo](docs/demo_comparison.png)
+![Demo](docs/demo.gif)
 
 ---
 
